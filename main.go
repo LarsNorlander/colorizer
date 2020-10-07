@@ -12,7 +12,7 @@ func main() {
 	val := 26.0
 	for i := 0; i < 13; i++ {
 		fmt.Printf("step: %02d\t%f\t%f\n", i, val, math.Round(val))
-		val -= step
+		val += step
 	}
 }
 
@@ -57,8 +57,8 @@ func average(x uint8, y uint8) uint8 {
 	return uint8(ciel)
 }
 
-func steps(x uint8, y uint8, steps int) float64 {
-	diff := int(x) - int(y)
+func steps(x uint8, y uint8, steps uint) float64 {
+	diff := int(y) - int(x)
 	return float64(diff) / float64(steps)
 }
 
