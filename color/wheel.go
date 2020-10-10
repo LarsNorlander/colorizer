@@ -30,6 +30,80 @@ func NewColorWheel() *ColorWheel {
 	return &cw
 }
 
+func GenerateColorWheel(r RGB, g RGB, b RGB) *ColorWheel {
+	const (
+		Red = iota
+		Orange
+		Yellow
+		YellowGreen
+		Green
+		GreenCyan
+		Cyan
+		CyanBlue
+		Blue
+		BlueMagenta
+		Magenta
+		MagentaRed
+	)
+
+	red := r.ToHSL()
+	green := g.ToHSL()
+	blue := b.ToHSL()
+
+	cw := NewColorWheel()
+
+	// Set RGB
+	cw.Jump(Red)
+	cw.Set(r)
+
+	cw.Jump(Green)
+	cw.Set(g)
+
+	cw.Jump(Blue)
+	cw.Set(b)
+
+	cw.Jump(Yellow)
+	yellow := HSLGradient(1, red, green)[1]
+	cw.Set(yellow.ToRGB())
+
+	cw.Jump(Cyan)
+	cyan := HSLGradient(1, green, blue)[1]
+	cw.Set(cyan.ToRGB())
+
+	cw.Jump(Magenta)
+	magenta := HSLGradient(1, blue, red)[1]
+	cw.Set(magenta.ToRGB())
+
+	// Set Tertiary
+	cw.Jump(Orange)
+	orange := HSLGradient(1, red, yellow)[1]
+	cw.Set(orange.ToRGB())
+
+	cw.Jump(YellowGreen)
+	greenYellow := HSLGradient(1, yellow, green)[1]
+	cw.Set(greenYellow.ToRGB())
+
+	cw.Jump(GreenCyan)
+	greenCyan := HSLGradient(1, green, cyan)[1]
+	cw.Set(greenCyan.ToRGB())
+
+	cw.Jump(CyanBlue)
+	cyanBlue := HSLGradient(1, cyan, blue)[1]
+	cw.Set(cyanBlue.ToRGB())
+
+	cw.Jump(BlueMagenta)
+	blueMagenta := HSLGradient(1, blue, magenta)[1]
+	cw.Set(blueMagenta.ToRGB())
+
+	cw.Jump(MagentaRed)
+	magentaRed := HSLGradient(1, magenta, red)[1]
+	cw.Set(magentaRed.ToRGB())
+
+	cw.Jump(Red) // Reset pointer
+
+	return cw
+}
+
 // Moves current pointer to the next value, and returns it
 func (cw *ColorWheel) Next() RGB {
 	cw.current = cw.current.next

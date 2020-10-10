@@ -7,25 +7,55 @@ import (
 )
 
 func main() {
-	cw := color.NewColorWheel()
-	fmt.Println(cw)
-	cw.Set(color.MustParseHex("#1a1f27").ToRGB())
-	fmt.Println(cw)
-	cw.Next()
-	cw.Set(color.MustParseHex("#36FF00").ToRGB())
-	fmt.Println(cw)
-	cw.Next()
-	cw.Set(color.MustParseHex("#f7f8fa").ToRGB())
-	fmt.Println(cw)
-	cw.Previous()
-	cw.Set(color.MustParseHex("#1a1f27").ToRGB())
-	fmt.Println(cw)
-	cw.Jump(12)
-	cw.Set(color.MustParseHex("#00ccff").ToRGB())
-	fmt.Println(cw)
+	testGenerateColors("#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF")
+	testGenerateColors("#1a1f27", "#f7f8fa", "#FF4D65", "#36FF00", "#24B7FF")
+	testGenerateColors("#1c2872", "#fcffd1", "#ff5700", "#00ff64", "#b600ff")
+
 	//rgbGradientTest()
 	//hueGradientTest()
 	//gradientDump()
+}
+
+func testGenerateColors(blk string, wht string, r string, g string, b string) {
+	fmt.Printf("blk: %s\n", blk)
+	fmt.Printf("wht: %s\n", wht)
+	fmt.Printf("red: %s\n", r)
+	fmt.Printf("grn: %s\n", g)
+	fmt.Printf("blu: %s\n", b)
+	fmt.Println()
+
+	black := color.MustParseHex(blk).ToRGB()
+	white := color.MustParseHex(wht).ToRGB()
+
+	red := color.MustParseHex(r).ToRGB()
+	green := color.MustParseHex(g).ToRGB()
+	blue := color.MustParseHex(b).ToRGB()
+
+	cw := color.GenerateColorWheel(
+		red,
+		green,
+		blue,
+	)
+
+	fmt.Println("The color wheel:")
+	fmt.Println(cw)
+	fmt.Println()
+
+	fmt.Println("The color table:")
+	for i := 0; i < 12; i++ {
+		grad := color.RGBGradient(3,
+			black,
+			cw.Get(),
+			white,
+		)
+		for i := range grad {
+			fmt.Print(grad[i].ToHex())
+		}
+		fmt.Println()
+		cw.Next()
+	}
+
+	fmt.Println()
 }
 
 func rgbGradientTest() {
