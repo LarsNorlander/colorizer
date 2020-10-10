@@ -1,15 +1,20 @@
 package color
 
 import (
-	"errors"
 	"fmt"
 	"math"
 )
 
-var ErrInvalidHue = errors.New("invalid hue value, must be in the range of [0, 360)")
+type InvalidHueError struct {
+	Hue
+}
+
+func (e *InvalidHueError) Error() string {
+	return fmt.Sprintf("invalid hue value: %.2f, must be in the range of [0, 360)", e.Hue.Val)
+}
 
 func NewHue(val float64) Hue {
-	return Hue{Val: normalizeHueValue(val)}
+	return Hue{Val: normalizeDegrees(val)}
 }
 
 // Represents a color wheel in degrees
@@ -22,6 +27,12 @@ func (hue Hue) IsValid() bool {
 	return hue.Val >= 0 && hue.Val < 360
 }
 
+func (hue Hue) MustBeValid() {
+	if !hue.IsValid() {
+		panic(&InvalidHueError{hue})
+	}
+}
+
 func (hue Hue) String() string {
 	return fmt.Sprintf("%.1f\u00B0", hue.Val)
 }
@@ -29,11 +40,9 @@ func (hue Hue) String() string {
 // If delta is positive, it moves the hue clockwise
 // If delta is negative, it moves the hue counter clockwise
 func MoveHue(hue Hue, delta float64) Hue {
-	if !hue.IsValid() {
-		panic(ErrInvalidHue)
-	}
+	hue.MustBeValid()
 	return Hue{
-		Val: normalizeHueValue(hue.Val + delta),
+		Val: normalizeDegrees(hue.Val + delta),
 	}
 }
 
@@ -71,7 +80,7 @@ func HueDistanceNearest(from Hue, to Hue) float64 {
 	}
 }
 
-func normalizeHueValue(val float64) float64 {
+func normalizeDegrees(val float64) float64 {
 	if val >= 0 && val < 360 {
 		return val
 	} else if val >= 360 {
@@ -84,7 +93,7 @@ func normalizeHueValue(val float64) float64 {
 	return val
 }
 
-func RGBtoHue(rgb RGB) Hue {
+func (rgb RGB) ToHue() Hue {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min

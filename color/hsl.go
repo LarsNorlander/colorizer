@@ -14,7 +14,7 @@ func (hsl HSL) String() string {
 	return fmt.Sprintf("hsl(%f, %f, %f)", hsl.H, hsl.S, hsl.L)
 }
 
-func RGBtoHSL(rgb RGB) HSL {
+func (rgb RGB) ToHSL() HSL {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
@@ -28,7 +28,7 @@ func RGBtoHSL(rgb RGB) HSL {
 		}
 	}
 
-	h := RGBtoHue(rgb)
+	h := rgb.ToHue()
 
 	var s float64
 	if l == 0 || l == 1 {
@@ -40,7 +40,7 @@ func RGBtoHSL(rgb RGB) HSL {
 	return HSL{H: h, S: s, L: l}
 }
 
-func HSLtoRGB(hsl HSL) RGB {
+func (hsl HSL) ToRGB() RGB {
 	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
 	hP := hsl.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
@@ -48,31 +48,31 @@ func HSLtoRGB(hsl HSL) RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
-	return generateHSLGradientHelper(
+func HSLGradient(between int, hsl ...HSL) []HSL {
+	return hslGradientHelper(
 		HueDistanceCW,
 		between,
 		hsl...,
 	)
 }
 
-func GenerateReverseHSLGradient(between int, hsl ...HSL) []HSL {
-	return generateHSLGradientHelper(
+func ReverseHSLGradient(between int, hsl ...HSL) []HSL {
+	return hslGradientHelper(
 		HueDistanceCCW,
 		between,
 		hsl...,
 	)
 }
 
-func GenerateNearestHSLGradient(between int, hsl ...HSL) []HSL {
-	return generateHSLGradientHelper(
+func NearestHSLGradient(between int, hsl ...HSL) []HSL {
+	return hslGradientHelper(
 		HueDistanceNearest,
 		between,
 		hsl...,
 	)
 }
 
-func generateHSLGradientHelper(
+func hslGradientHelper(
 	hueStepCalc func(from Hue, to Hue) float64,
 	between int, hsl ...HSL,
 ) []HSL {
@@ -87,8 +87,8 @@ func generateHSLGradientHelper(
 		y := hsl[i+1]
 
 		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
-		sStep := computeStep(x.S, y.S, stepCount)
-		lStep := computeStep(x.L, y.L, stepCount)
+		sStep := calcStep(x.S, y.S, stepCount)
+		lStep := calcStep(x.L, y.L, stepCount)
 
 		hCur := x.H
 		sCur := x.S
@@ -106,11 +106,11 @@ func generateHSLGradientHelper(
 	return grad
 }
 
-func GenerateLightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []HSL {
+func LightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []HSL {
 	grad := make([]HSL, 2+between)
 	stepCount := between + 1
 
-	lStep := computeStep(0+darkClip, 1-lightClip, stepCount)
+	lStep := calcStep(0+darkClip, 1-lightClip, stepCount)
 
 	lCur := 0.0 + darkClip
 

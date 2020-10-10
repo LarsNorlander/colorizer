@@ -14,13 +14,13 @@ func (hsv HSV) String() string {
 	return fmt.Sprintf("hsv(%f, %f, %f)", hsv.H, hsv.S, hsv.V)
 }
 
-func RGBtoHSV(rgb RGB) HSV {
+func (rgb RGB) ToHSV() HSV {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 	v := max
 
-	h := RGBtoHue(rgb)
+	h := rgb.ToHue()
 
 	var s float64
 	if v == 0 {
@@ -32,7 +32,7 @@ func RGBtoHSV(rgb RGB) HSV {
 	return HSV{H: h, S: s, V: v}
 }
 
-func HSVtoRGB(hsv HSV) RGB {
+func (hsv HSV) ToRGB() RGB {
 	c := hsv.V * hsv.S
 	hP := hsv.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
@@ -40,31 +40,31 @@ func HSVtoRGB(hsv HSV) RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func GenerateHSVGradient(between int, hsv ...HSV) []HSV {
-	return generateHSVGradientHelper(
+func HSVGradient(between int, hsv ...HSV) []HSV {
+	return hsvGradientHelper(
 		HueDistanceCW,
 		between,
 		hsv...,
 	)
 }
 
-func GenerateReverseHSVGradient(between int, hsv ...HSV) []HSV {
-	return generateHSVGradientHelper(
+func ReverseHSVGradient(between int, hsv ...HSV) []HSV {
+	return hsvGradientHelper(
 		HueDistanceCCW,
 		between,
 		hsv...,
 	)
 }
 
-func GenerateNearestHSVGradient(between int, hsv ...HSV) []HSV {
-	return generateHSVGradientHelper(
+func NearestHSVGradient(between int, hsv ...HSV) []HSV {
+	return hsvGradientHelper(
 		HueDistanceNearest,
 		between,
 		hsv...,
 	)
 }
 
-func generateHSVGradientHelper(
+func hsvGradientHelper(
 	hueStepCalc func(from Hue, to Hue) float64,
 	between int,
 	hsv ...HSV,
@@ -80,8 +80,8 @@ func generateHSVGradientHelper(
 		y := hsv[i+1]
 
 		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
-		sStep := computeStep(x.S, y.S, stepCount)
-		lStep := computeStep(x.V, y.V, stepCount)
+		sStep := calcStep(x.S, y.S, stepCount)
+		lStep := calcStep(x.V, y.V, stepCount)
 
 		hCur := x.H
 		sCur := x.S

@@ -3,6 +3,7 @@ package color
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -18,7 +19,15 @@ func (hex Hex) String() string {
 	return fmt.Sprintf("#%02X%02X%02X", hex.R, hex.G, hex.B)
 }
 
-func (hex Hex) AsRGB() RGB {
+func (rgb RGB) ToHex() Hex {
+	return Hex{
+		R: uint8(math.Round(255 * rgb.R)),
+		G: uint8(math.Round(255 * rgb.G)),
+		B: uint8(math.Round(255 * rgb.B)),
+	}
+}
+
+func (hex Hex) ToRGB() RGB {
 	return RGB{
 		R: float64(hex.R) / 255.0,
 		G: float64(hex.G) / 255.0,

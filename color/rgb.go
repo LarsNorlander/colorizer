@@ -1,7 +1,7 @@
 package color
 
 import (
-	"math"
+	"fmt"
 )
 
 type RGB struct {
@@ -9,16 +9,7 @@ type RGB struct {
 }
 
 func (rgb RGB) String() string {
-	//return fmt.Sprintf("rgb(%f,%f,%f)", rgb.R, rgb.G, rgb.B)
-	return rgb.AsHex().String()
-}
-
-func (rgb RGB) AsHex() Hex {
-	return Hex{
-		R: uint8(math.Round(255 * rgb.R)),
-		G: uint8(math.Round(255 * rgb.G)),
-		B: uint8(math.Round(255 * rgb.B)),
-	}
+	return fmt.Sprintf("rgb(%f,%f,%f)", rgb.R, rgb.G, rgb.B)
 }
 
 func Blend(x RGB, y RGB) RGB {
@@ -29,7 +20,7 @@ func Blend(x RGB, y RGB) RGB {
 	}
 }
 
-func GenerateRGBGradient(between int, rgb ...RGB) []RGB {
+func RGBGradient(between int, rgb ...RGB) []RGB {
 	rgbLen := len(rgb)
 	grad := make([]RGB, rgbLen+(between*(rgbLen-1)))
 	stepCount := between + 1
@@ -40,9 +31,9 @@ func GenerateRGBGradient(between int, rgb ...RGB) []RGB {
 		x := rgb[i]
 		y := rgb[i+1]
 
-		rStep := computeStep(x.R, y.R, stepCount)
-		gStep := computeStep(x.G, y.G, stepCount)
-		bStep := computeStep(x.B, y.B, stepCount)
+		rStep := calcStep(x.R, y.R, stepCount)
+		gStep := calcStep(x.G, y.G, stepCount)
+		bStep := calcStep(x.B, y.B, stepCount)
 
 		rCur := x.R
 		gCur := x.G
