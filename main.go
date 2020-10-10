@@ -4,16 +4,22 @@ import (
 	"fmt"
 	"github.com/LarsNorlander/colorizer/color"
 	"math/rand"
+	"time"
 )
 
 func main() {
 	testGenerateColors("#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF")
 	fmt.Println("---")
 	fmt.Println()
-	testGenerateColors("#1a1f27", "#f7f8fa", "#FF4D65", "#36FF00", "#24B7FF")
+	testGenerateColors("#1a1f27", "#f7f8fa", "#FF4D65", "#75ff3a", "#278bff")
 	fmt.Println("---")
 	fmt.Println()
-	for i := 0; i < 1; i++ {
+	testGenerateColors("#1a1f27", "#f7f8fa", "#FF4D65", "#35FF55", "#278bff")
+	fmt.Println("---")
+	fmt.Println()
+
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 3; i++ {
 		testGenerateColors(randHex().String(), randHex().String(), randHex().String(), randHex().String(), randHex().String())
 		fmt.Println("---")
 		fmt.Println()
@@ -45,9 +51,17 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println(cw)
 	fmt.Println()
 
+	fmt.Println("Shades (Black to White):")
+	lightnessGrad := color.NearestHSLGradient(11, black.ToHSL(), white.ToHSL())
+	for i := range lightnessGrad {
+		fmt.Print(lightnessGrad[i].ToRGB().ToHex())
+	}
+	fmt.Println()
+	fmt.Println()
+
 	fmt.Println("The color table:")
 	for i := 0; i < 12; i++ {
-		grad := color.RGBGradient(3,
+		grad := color.RGBGradient(5,
 			black,
 			cw.Get(),
 			white,
@@ -58,22 +72,37 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 		fmt.Println()
 		cw.Next()
 	}
-
 	fmt.Println()
 
-	fmt.Println("Shades (Black to White):")
-	lightnessGrad := color.NearestHSLGradient(7, black.ToHSL(), white.ToHSL())
-	for i := range lightnessGrad {
-		fmt.Print(lightnessGrad[i].ToRGB().ToHex())
+	fmt.Println("Shade table (Pure Hue to Black):")
+	cw.Jump(0)
+	for i := 0; i < 12; i++ {
+		grad := color.RGBGradient(11, cw.Get(), black)
+		for i := range grad {
+			fmt.Print(grad[i].ToHex())
+		}
+		fmt.Println()
+		cw.Next()
 	}
 	fmt.Println()
+
+	fmt.Println("Tint table (Pure Hue to White):")
+	cw.Jump(0)
+	for i := 0; i < 12; i++ {
+		grad := color.RGBGradient(11, cw.Get(), white)
+		for i := range grad {
+			fmt.Print(grad[i].ToHex())
+		}
+		fmt.Println()
+		cw.Next()
+	}
 	fmt.Println()
 
-	fmt.Println("Tone table (Color to Gray):")
+	fmt.Println("Tone table (Pure Hue to Gray):")
 	gray := color.NearestHSLGradient(1, black.ToHSL(), white.ToHSL())[1].ToRGB()
 	cw.Jump(0)
 	for i := 0; i < 12; i++ {
-		grad := color.RGBGradient(7, cw.Get(), gray)
+		grad := color.RGBGradient(11, cw.Get(), gray)
 		for i := range grad {
 			fmt.Print(grad[i].ToHex())
 		}
