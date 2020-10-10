@@ -20,7 +20,7 @@ func RGBtoHSV(rgb RGB) HSV {
 	c := max - min
 	v := max
 
-	h := computeHue(rgb)
+	h := RGBtoHue(rgb)
 
 	var s float64
 	if v == 0 {
@@ -41,6 +41,34 @@ func HSVtoRGB(hsv HSV) RGB {
 }
 
 func GenerateHSVGradient(between int, hsv ...HSV) []HSV {
+	return generateHSVGradientHelper(
+		HueDistanceCW,
+		between,
+		hsv...,
+	)
+}
+
+func GenerateReverseHSVGradient(between int, hsv ...HSV) []HSV {
+	return generateHSVGradientHelper(
+		HueDistanceCCW,
+		between,
+		hsv...,
+	)
+}
+
+func GenerateNearestHSVGradient(between int, hsv ...HSV) []HSV {
+	return generateHSVGradientHelper(
+		HueDistanceNearest,
+		between,
+		hsv...,
+	)
+}
+
+func generateHSVGradientHelper(
+	hueStepCalc func(from Hue, to Hue) float64,
+	between int,
+	hsv ...HSV,
+) []HSV {
 	hsvLen := len(hsv)
 	grad := make([]HSV, hsvLen+(between*(hsvLen-1)))
 	stepCount := between + 1
@@ -51,7 +79,7 @@ func GenerateHSVGradient(between int, hsv ...HSV) []HSV {
 		x := hsv[i]
 		y := hsv[i+1]
 
-		hStep := HueDistanceCW(x.H, y.H) / float64(stepCount)
+		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
 		sStep := computeStep(x.S, y.S, stepCount)
 		lStep := computeStep(x.V, y.V, stepCount)
 

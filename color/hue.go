@@ -13,6 +13,7 @@ func NewHue(val float64) Hue {
 }
 
 // Represents a color wheel in degrees
+// Should be created with NewHue()
 type Hue struct {
 	Val float64 // a value that must be in the range of [0, 360)
 }
@@ -25,13 +26,15 @@ func (hue Hue) String() string {
 	return fmt.Sprintf("%.1f\u00B0", hue.Val)
 }
 
-// If positive, moves the color wheel clockwise
-// If negative, moves the color wheel counter clockwise
+// If delta is positive, it moves the hue clockwise
+// If delta is negative, it moves the hue counter clockwise
 func MoveHue(hue Hue, delta float64) Hue {
 	if !hue.IsValid() {
 		panic(ErrInvalidHue)
 	}
-	return Hue{normalizeHueValue(hue.Val + delta)}
+	return Hue{
+		Val: normalizeHueValue(hue.Val + delta),
+	}
 }
 
 func HueDistanceCW(from Hue, to Hue) float64 {
@@ -81,13 +84,12 @@ func normalizeHueValue(val float64) float64 {
 	return val
 }
 
-func computeHue(rgb RGB) Hue {
+func RGBtoHue(rgb RGB) Hue {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 
 	var hP float64
-
 	switch max {
 	case rgb.R:
 		hP = math.Mod((rgb.G-rgb.B)/c, 6)

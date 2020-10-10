@@ -28,7 +28,7 @@ func RGBtoHSL(rgb RGB) HSL {
 		}
 	}
 
-	h := computeHue(rgb)
+	h := RGBtoHue(rgb)
 
 	var s float64
 	if l == 0 || l == 1 {
@@ -49,6 +49,33 @@ func HSLtoRGB(hsl HSL) RGB {
 }
 
 func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
+	return generateHSLGradientHelper(
+		HueDistanceCW,
+		between,
+		hsl...,
+	)
+}
+
+func GenerateReverseHSLGradient(between int, hsl ...HSL) []HSL {
+	return generateHSLGradientHelper(
+		HueDistanceCCW,
+		between,
+		hsl...,
+	)
+}
+
+func GenerateNearestHSLGradient(between int, hsl ...HSL) []HSL {
+	return generateHSLGradientHelper(
+		HueDistanceNearest,
+		between,
+		hsl...,
+	)
+}
+
+func generateHSLGradientHelper(
+	hueStepCalc func(from Hue, to Hue) float64,
+	between int, hsl ...HSL,
+) []HSL {
 	hslLen := len(hsl)
 	grad := make([]HSL, hslLen+(between*(hslLen-1)))
 	stepCount := between + 1
@@ -59,7 +86,7 @@ func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
 		x := hsl[i]
 		y := hsl[i+1]
 
-		hStep := HueDistanceCW(x.H, y.H) / float64(stepCount)
+		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
 		sStep := computeStep(x.S, y.S, stepCount)
 		lStep := computeStep(x.L, y.L, stepCount)
 
