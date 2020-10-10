@@ -9,93 +9,87 @@ type HSL struct {
 	H, S, L float64
 }
 
-func (h HSL) String() string {
-	return fmt.Sprintf("hsl(%f, %f, %f)", h.H, h.S, h.L)
+func (hsl HSL) String() string {
+	return fmt.Sprintf("hsl(%f, %f, %f)", hsl.H, hsl.S, hsl.L)
 }
 
-func RGBtoHSL(c RGB) HSL {
-	min := math.Min(math.Min(c.R, c.G), c.B)
-	max := math.Max(math.Max(c.R, c.G), c.B)
-	chroma := max - min
-	lum := (max + min) / 2
+func RGBtoHSL(rgb RGB) HSL {
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
+	c := max - min
+	l := (max + min) / 2
 
-	if chroma == 0 {
+	if c == 0 {
 		return HSL{
 			H: 0.0,
 			S: 0.0,
-			L: lum,
+			L: l,
 		}
 	}
 
-	var hueP float64
+	h := computeHue(rgb)
 
-	switch max {
-	case c.R:
-		hueP = math.Mod((c.G-c.B)/chroma, 6)
-	case c.G:
-		hueP = ((c.B - c.R) / chroma) + 2
-	case c.B:
-		hueP = ((c.R - c.G) / chroma) + 4
-	}
-
-	hue := hueP * 60
-	if hue < 0 {
-		hue += 360
-	}
-
-	if min == max {
-		return HSL{
-			H: 0.0,
-			S: 0.0,
-			L: lum,
-		}
-	}
-
-	var sat float64
-	if lum == 0 || lum == 1 {
-		sat = 0
+	var s float64
+	if l == 0 || l == 1 {
+		s = 0
 	} else {
-		sat = chroma / (1 - math.Abs(2*lum-1))
+		s = c / (1 - math.Abs(2*l-1))
 	}
 
-	return HSL{
-		H: hue,
-		S: sat,
-		L: lum,
-	}
+	return HSL{H: h, S: s, L: l}
 }
 
-func HSLtoRGB(color HSL) RGB {
-	c := (1 - math.Abs(2*color.L-1)) * color.S
-
-	hP := color.H / 60
-
+func HSLtoRGB(hsl HSL) RGB {
+	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
+	hP := hsl.H / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
+	m := hsl.L - c/2
+	return computeRGB(c, x, hP, m)
+}
 
-	var r1, g1, b1 float64
+func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
+	hslLen := len(hsl)
+	grad := make([]HSL, hslLen+(between*(hslLen-1)))
+	stepCount := between + 1
 
-	switch {
-	case 0 <= hP && hP <= 1:
-		r1, g1, b1 = c, x, 0
-	case 1 <= hP && hP <= 2:
-		r1, g1, b1 = x, c, 0
-	case 2 <= hP && hP <= 3:
-		r1, g1, b1 = 0, c, x
-	case 3 <= hP && hP <= 4:
-		r1, g1, b1 = 0, x, c
-	case 4 <= hP && hP <= 5:
-		r1, g1, b1 = x, 0, c
-	case 5 <= hP && hP <= 6:
-		r1, g1, b1 = c, 0, x
-	default:
-		r1, g1, b1 = 0, 0, 0
+	grad[len(grad)-1] = hsl[hslLen-1]
+
+	for i := 0; i < hslLen-1; i++ {
+		x := hsl[i]
+		y := hsl[i+1]
+
+		hStep := computeStep(x.H, y.H, stepCount)
+		sStep := computeStep(x.S, y.S, stepCount)
+		lStep := computeStep(x.L, y.L, stepCount)
+
+		hCur := x.H
+		sCur := x.S
+		lCur := x.L
+
+		for j := 0; j < stepCount; j++ {
+			offset := i * stepCount
+			grad[j+offset] = HSL{hCur, sCur, lCur}
+			hCur += hStep
+			sCur += sStep
+			lCur += lStep
+		}
 	}
 
-	m := color.L - c/2
+	return grad
+}
 
-	return RGB{
-		R: r1 + m,
-		G: g1 + m,
-		B: b1 + m,
+func GenerateLightnessGradient(h, s float64, between int, darkClip, lightClip float64) []HSL {
+	grad := make([]HSL, 2+between)
+	stepCount := between + 1
+
+	lStep := computeStep(0+darkClip, 1-lightClip, stepCount)
+
+	lCur := 0.0 + darkClip
+
+	for i := 0; i < len(grad); i++ {
+		grad[i] = HSL{h, s, lCur}
+		lCur += lStep
 	}
+
+	return grad
 }

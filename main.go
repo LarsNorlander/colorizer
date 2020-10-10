@@ -3,60 +3,59 @@ package main
 import (
 	"fmt"
 	"github.com/LarsNorlander/colorizer/color"
+	"math/rand"
+	"time"
 )
 
 func main() {
-	hex := "#1a1f27"
-	fmt.Printf("Testing: %s\n", hex)
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 5; i++ {
+		run()
+		fmt.Println()
+	}
+}
 
-	rgb := color.MustParseHex(hex)
-	hsl := color.RGBtoHSL(rgb)
-	fmt.Println(rgb)
-	fmt.Println(hsl)
+func run() {
+	rgbOne := randHex().AsRGB()
+	rgbTwo := randHex().AsRGB()
+	rgbThree := randHex().AsRGB()
+	between := 9
 
-	fmt.Println("Test converting HSL to RGB and then HEX")
-	fmt.Println(color.HSLtoRGB(hsl).AsHex())
-
-	fmt.Println("Test generating RGB gradient")
-	grad1 := color.GenerateRGBGradient2(rgb, color.MustParseHex("#FF4D65"), 11)
-	//grad1 := color.GenerateRGBGradient2(color.MustParseHex("#FF4D65"), color.MustParseHex("#f7f8fa"), 13)
-	for i := range grad1 {
-		fmt.Print(grad1[i].AsHex())
+	rgbGradient := color.GenerateRGBGradient(between,
+		rgbOne,
+		rgbTwo,
+		rgbThree,
+	)
+	for i := range rgbGradient {
+		fmt.Print(rgbGradient[i].AsHex())
 	}
 	fmt.Println()
-	fmt.Println()
 
-	fmt.Println("Test generating gradient from black to white")
-	grad2 := color.GenerateBlackToWhiteGradient(hsl, 28)
-	for i := range grad2 {
-		fmt.Print(color.HSLtoRGB(grad2[i]).AsHex())
+	hslGradient := color.GenerateHSLGradient(between,
+		color.RGBtoHSL(rgbOne),
+		color.RGBtoHSL(rgbTwo),
+		color.RGBtoHSL(rgbThree),
+	)
+	for i := range hslGradient {
+		fmt.Print(color.HSLtoRGB(hslGradient[i]).AsHex())
 	}
 	fmt.Println()
-	fmt.Println()
 
-	fmt.Println("Test generating HSL gradient")
-	grad3 := color.GenerateHSLGradient(hsl, color.RGBtoHSL(color.MustParseHex("#FF4D65")), 11)
-	for i := range grad3 {
-		fmt.Print(color.HSLtoRGB(grad3[i]).AsHex())
+	hsvGradient := color.GenerateHSVGradient(between,
+		color.RGBtoHSV(rgbOne),
+		color.RGBtoHSV(rgbTwo),
+		color.RGBtoHSV(rgbThree),
+	)
+	for i := range hsvGradient {
+		fmt.Print(color.HSVtoRGB(hsvGradient[i]).AsHex())
 	}
 	fmt.Println()
-	fmt.Println()
+}
 
-	// GenerateLightnessGradient
-	fmt.Println("Test generating lightness gradient")
-	grad4 := color.GenerateLightnessGradient(hsl.H, hsl.S, hsl.L, 0.025, 10)
-	for i := range grad4 {
-		fmt.Print(color.HSLtoRGB(grad4[i]).AsHex())
+func randHex() color.Hex {
+	return color.Hex{
+		R: uint8(rand.Intn(256)),
+		G: uint8(rand.Intn(256)),
+		B: uint8(rand.Intn(256)),
 	}
-	fmt.Println()
-	fmt.Println()
-
-	//GenerateRGBGradient3
-	fmt.Println("Test generating 3 point rgb gradient")
-	grad5 := color.GenerateRGBGradient3(color.MustParseHex("#1a1f27"), color.MustParseHex("#FF4D65"), color.MustParseHex("#f7f8fa"), 8)
-	for i := range grad5 {
-		fmt.Print(grad5[i].AsHex())
-	}
-	fmt.Println()
-	fmt.Println()
 }
