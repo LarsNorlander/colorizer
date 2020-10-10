@@ -7,9 +7,25 @@ import (
 )
 
 func main() {
-	rgbGradientTest()
-	hueGradientTest()
-	gradientDump()
+	cw := color.NewColorWheel()
+	fmt.Println(cw)
+	cw.Set(color.MustParseHex("#1a1f27").ToRGB())
+	fmt.Println(cw)
+	cw.Next()
+	cw.Set(color.MustParseHex("#36FF00").ToRGB())
+	fmt.Println(cw)
+	cw.Next()
+	cw.Set(color.MustParseHex("#f7f8fa").ToRGB())
+	fmt.Println(cw)
+	cw.Previous()
+	cw.Set(color.MustParseHex("#1a1f27").ToRGB())
+	fmt.Println(cw)
+	cw.Jump(12)
+	cw.Set(color.MustParseHex("#00ccff").ToRGB())
+	fmt.Println(cw)
+	//rgbGradientTest()
+	//hueGradientTest()
+	//gradientDump()
 }
 
 func rgbGradientTest() {
