@@ -143,13 +143,11 @@ func (cw ColorWheel) String() string {
 	cur := cw.start
 	for {
 		str += cur.value.ToHex().String()
-		str += ", "
 		cur = cur.next
 		if cur == cw.start {
 			break
 		}
 	}
-	str += cur.value.ToHex().String()
 	return str
 }
 

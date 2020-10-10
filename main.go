@@ -8,12 +8,16 @@ import (
 
 func main() {
 	testGenerateColors("#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF")
+	fmt.Println("---")
+	fmt.Println()
 	testGenerateColors("#1a1f27", "#f7f8fa", "#FF4D65", "#36FF00", "#24B7FF")
-	testGenerateColors("#1c2872", "#fcffd1", "#ff5700", "#00ff64", "#b600ff")
-
-	//rgbGradientTest()
-	//hueGradientTest()
-	//gradientDump()
+	fmt.Println("---")
+	fmt.Println()
+	for i := 0; i < 1; i++ {
+		testGenerateColors(randHex().String(), randHex().String(), randHex().String(), randHex().String(), randHex().String())
+		fmt.Println("---")
+		fmt.Println()
+	}
 }
 
 func testGenerateColors(blk string, wht string, r string, g string, b string) {
@@ -55,6 +59,27 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 		cw.Next()
 	}
 
+	fmt.Println()
+
+	fmt.Println("Shades (Black to White):")
+	lightnessGrad := color.NearestHSLGradient(7, black.ToHSL(), white.ToHSL())
+	for i := range lightnessGrad {
+		fmt.Print(lightnessGrad[i].ToRGB().ToHex())
+	}
+	fmt.Println()
+	fmt.Println()
+
+	fmt.Println("Tone table (Color to Gray):")
+	gray := color.NearestHSLGradient(1, black.ToHSL(), white.ToHSL())[1].ToRGB()
+	cw.Jump(0)
+	for i := 0; i < 12; i++ {
+		grad := color.RGBGradient(7, cw.Get(), gray)
+		for i := range grad {
+			fmt.Print(grad[i].ToHex())
+		}
+		fmt.Println()
+		cw.Next()
+	}
 	fmt.Println()
 }
 
