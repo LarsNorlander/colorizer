@@ -47,6 +47,9 @@ func MoveHue(hue Hue, delta float64) Hue {
 }
 
 func HueDistanceCW(from Hue, to Hue) float64 {
+	from.MustBeValid()
+	to.MustBeValid()
+
 	if from.Val == to.Val {
 		return 0
 	} else if from.Val < to.Val {
@@ -57,6 +60,9 @@ func HueDistanceCW(from Hue, to Hue) float64 {
 }
 
 func HueDistanceCCW(from Hue, to Hue) float64 {
+	from.MustBeValid()
+	to.MustBeValid()
+
 	if from.Val == to.Val {
 		return 0
 	} else if from.Val > to.Val {
@@ -67,6 +73,9 @@ func HueDistanceCCW(from Hue, to Hue) float64 {
 }
 
 func HueDistanceNearest(from Hue, to Hue) float64 {
+	from.MustBeValid()
+	to.MustBeValid()
+
 	cwd := HueDistanceCW(from, to)
 	ccwd := HueDistanceCCW(from, to)
 
