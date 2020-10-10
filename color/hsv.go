@@ -6,7 +6,8 @@ import (
 )
 
 type HSV struct {
-	H, S, V float64
+	H    Hue
+	S, V float64
 }
 
 func (hsv HSV) String() string {
@@ -33,7 +34,7 @@ func RGBtoHSV(rgb RGB) HSV {
 
 func HSVtoRGB(hsv HSV) RGB {
 	c := hsv.V * hsv.S
-	hP := hsv.H / 60
+	hP := hsv.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
 	m := hsv.V - c
 	return computeRGB(c, x, hP, m)
@@ -50,7 +51,7 @@ func GenerateHSVGradient(between int, hsv ...HSV) []HSV {
 		x := hsv[i]
 		y := hsv[i+1]
 
-		hStep := computeStep(x.H, y.H, stepCount)
+		hStep := HueDistanceCW(x.H, y.H) / float64(stepCount)
 		sStep := computeStep(x.S, y.S, stepCount)
 		lStep := computeStep(x.V, y.V, stepCount)
 
@@ -61,7 +62,7 @@ func GenerateHSVGradient(between int, hsv ...HSV) []HSV {
 		for j := 0; j < stepCount; j++ {
 			offset := i * stepCount
 			grad[j+offset] = HSV{hCur, sCur, lCur}
-			hCur += hStep
+			hCur = MoveHue(hCur, hStep)
 			sCur += sStep
 			lCur += lStep
 		}

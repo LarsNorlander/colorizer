@@ -6,7 +6,8 @@ import (
 )
 
 type HSL struct {
-	H, S, L float64
+	H    Hue
+	S, L float64
 }
 
 func (hsl HSL) String() string {
@@ -21,7 +22,7 @@ func RGBtoHSL(rgb RGB) HSL {
 
 	if c == 0 {
 		return HSL{
-			H: 0.0,
+			H: NewHue(0.0),
 			S: 0.0,
 			L: l,
 		}
@@ -41,7 +42,7 @@ func RGBtoHSL(rgb RGB) HSL {
 
 func HSLtoRGB(hsl HSL) RGB {
 	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
-	hP := hsl.H / 60
+	hP := hsl.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
 	m := hsl.L - c/2
 	return computeRGB(c, x, hP, m)
@@ -58,7 +59,7 @@ func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
 		x := hsl[i]
 		y := hsl[i+1]
 
-		hStep := computeStep(x.H, y.H, stepCount)
+		hStep := HueDistanceCW(x.H, y.H) / float64(stepCount)
 		sStep := computeStep(x.S, y.S, stepCount)
 		lStep := computeStep(x.L, y.L, stepCount)
 
@@ -69,7 +70,7 @@ func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
 		for j := 0; j < stepCount; j++ {
 			offset := i * stepCount
 			grad[j+offset] = HSL{hCur, sCur, lCur}
-			hCur += hStep
+			hCur = MoveHue(hCur, hStep)
 			sCur += sStep
 			lCur += lStep
 		}
@@ -78,7 +79,7 @@ func GenerateHSLGradient(between int, hsl ...HSL) []HSL {
 	return grad
 }
 
-func GenerateLightnessGradient(h, s float64, between int, darkClip, lightClip float64) []HSL {
+func GenerateLightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []HSL {
 	grad := make([]HSL, 2+between)
 	stepCount := between + 1
 

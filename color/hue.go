@@ -2,6 +2,7 @@ package color
 
 import (
 	"errors"
+	"fmt"
 	"math"
 )
 
@@ -18,6 +19,10 @@ type Hue struct {
 
 func (hue Hue) IsValid() bool {
 	return hue.Val >= 0 && hue.Val < 360
+}
+
+func (hue Hue) String() string {
+	return fmt.Sprintf("%.1f\u00B0", hue.Val)
 }
 
 // If positive, moves the color wheel clockwise
@@ -76,7 +81,7 @@ func normalizeHueValue(val float64) float64 {
 	return val
 }
 
-func computeHue(rgb RGB) float64 {
+func computeHue(rgb RGB) Hue {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
@@ -93,11 +98,8 @@ func computeHue(rgb RGB) float64 {
 	}
 
 	h := hP * 60
-	if h < 0 {
-		h += 360
-	}
 
-	return h
+	return NewHue(h)
 }
 
 func computeRGB(c, x, hP, m float64) RGB {
