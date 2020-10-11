@@ -1,7 +1,5 @@
 package color
 
-import "fmt"
-
 var (
 	whitePoint = Point{
 		X: 0,
@@ -11,14 +9,20 @@ var (
 		X: 0,
 		Y: 0,
 	}
-	whiteHueLine = Line{
-		Slope: -0.268,
-		Yi:    1,
+	huePoint = Point{
+		X: heightTriangle(1, areaEquilateralTriangle(1)),
+		Y: 0.5,
 	}
-	blackHueLine = Line{
-		Slope: 1.732,
-		Yi:    0,
-	}
+	//whiteHueLine = Line{
+	//	Slope: -0.268,
+	//	Yi:    1,
+	//}
+	//blackHueLine = Line{
+	//	Slope: 1.732,
+	//	Yi:    0,
+	//}
+	whiteHueLine = calculateLine(whitePoint, huePoint)
+	blackHueLine = calculateLine(blackPoint, huePoint)
 )
 
 func MapToWold(cw *ColorWheel, blk RGB, wht RGB, source RGB) RGB {
@@ -28,16 +32,16 @@ func MapToWold(cw *ColorWheel, blk RGB, wht RGB, source RGB) RGB {
 
 	lum := PartialBlendHSL(blk.ToHSL(), wht.ToHSL(), src.L, HueDistanceCW).ToRGB()
 	sat := PartialBlendRGB(lum, pureHue, src.S)
-
-	fmt.Println(src.FormalString())
-	fmt.Print("source  : ")
-	fmt.Println(source)
-	fmt.Print("pure hue: ")
-	fmt.Println(pureHue)
-	fmt.Print("sat     : ")
-	fmt.Println(sat)
-	fmt.Print("lum     : ")
-	fmt.Println(lum)
+	//
+	//fmt.Println(src.FormalString())
+	//fmt.Print("source  : ")
+	//fmt.Println(source)
+	//fmt.Print("pure hue: ")
+	//fmt.Println(pureHue)
+	//fmt.Print("sat     : ")
+	//fmt.Println(sat)
+	//fmt.Print("lum     : ")
+	//fmt.Println(lum)
 
 	var result RGB
 
@@ -52,16 +56,16 @@ func MapToWold(cw *ColorWheel, blk RGB, wht RGB, source RGB) RGB {
 		inter := intersect(lumLine, whiteHueLine)
 		dist := calcDistance(inter, whitePoint)
 		mixer := PartialBlendRGB(wht, pureHue, dist)
-		fmt.Print("mixer   : ")
-		fmt.Println(mixer)
+		//fmt.Print("mixer   : ")
+		//fmt.Println(mixer)
 		result = PartialBlendRGB(lum, mixer, src.S)
 
 	} else {
-		inter := intersect(lumLine, blackHueLine)
-		dist := calcDistance(inter, blackPoint)
+		inter := intersect(blackHueLine, lumLine)
+		dist := calcDistance(blackPoint, inter)
 		mixer := PartialBlendRGB(blk, pureHue, dist)
-		fmt.Print("mixer   : ")
-		fmt.Println(mixer)
+		//fmt.Print("mixer   : ")
+		//fmt.Println(mixer)
 		result = PartialBlendRGB(lum, mixer, src.S)
 	}
 

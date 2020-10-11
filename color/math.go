@@ -37,3 +37,11 @@ type Point struct {
 type Line struct {
 	Slope, Yi float64
 }
+
+func areaEquilateralTriangle(side float64) float64 {
+	return (math.Sqrt(3) / 4) * math.Pow(side, 2)
+}
+
+func heightTriangle(base float64, area float64) float64 {
+	return 2 * (area / base)
+}
