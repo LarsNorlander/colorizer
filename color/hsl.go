@@ -11,7 +11,7 @@ type HSL struct {
 }
 
 func (hsl HSL) FormalString() string {
-	return fmt.Sprintf("hsl(%f, %f, %f)", hsl.H, hsl.S, hsl.L)
+	return fmt.Sprintf("hsl(%.1f\u00B0, %.1f%%, %.1f%%)", hsl.H.Val, hsl.S * 100, hsl.L * 100)
 }
 
 func (hsl HSL) String() string {

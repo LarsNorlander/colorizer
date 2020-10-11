@@ -66,7 +66,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	fmt.Println("Shades (Black to White):")
-	lightnessGrad := color.NearestHSLGradient(11, black.ToHSL(), white.ToHSL())
+	lightnessGrad := color.HSLGradient(11, color.HueDistanceNearest, black.ToHSL(), white.ToHSL())
 	for i := range lightnessGrad {
 		fmt.Print(lightnessGrad[i].ToRGB().ToHex())
 	}
@@ -113,7 +113,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	fmt.Println("Tone table (Pure Hue to Gray):")
-	gray := color.NearestHSLGradient(1, black.ToHSL(), white.ToHSL())[1].ToRGB()
+	gray := color.HSLGradient(1, color.HueDistanceNearest, black.ToHSL(), white.ToHSL())[1].ToRGB()
 	cw.Jump(0)
 	for i := 0; i < 12; i++ {
 		grad := color.RGBGradient(11, cw.Get(), gray)
@@ -126,7 +126,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	cw.Jump(0)
-	lightnessGrad = color.NearestHSLGradient(11, white.ToHSL(), black.ToHSL())
+	lightnessGrad = color.HSLGradient(11, color.HueDistanceNearest, white.ToHSL(), black.ToHSL())
 	for i := 0; i < 12; i++ {
 		val := cw.Get()
 		fmt.Printf("HSL Table for %s:\n", val.ToHex())
@@ -156,10 +156,12 @@ func rgbGradientTest() {
 }
 
 func hueGradientTest() {
-	grad := color.NearestHSLGradient(1, []color.HSL{
-		color.MustParseHex("#FFDE00").ToRGB().ToHSL(),
-		color.MustParseHex("#00FFB3").ToRGB().ToHSL(),
-	}...)
+	grad := color.HSLGradient(1,
+		color.HueDistanceNearest,
+		[]color.HSL{
+			color.MustParseHex("#FFDE00").ToRGB().ToHSL(),
+			color.MustParseHex("#00FFB3").ToRGB().ToHSL(),
+		}...)
 	for i := range grad {
 		fmt.Print(grad[i].ToRGB().ToHex())
 	}
@@ -196,6 +198,7 @@ func gradientDump() {
 	fmt.Println()
 
 	hslGradient := color.HSLGradient(between,
+		color.HueDistanceCW,
 		rgbOne.ToHSL(),
 		rgbTwo.ToHSL(),
 		rgbThree.ToHSL(),
@@ -205,7 +208,8 @@ func gradientDump() {
 	}
 	fmt.Println()
 
-	reverseHslGradient := color.ReverseHSLGradient(between,
+	reverseHslGradient := color.HSLGradient(between,
+		color.HueDistanceCCW,
 		rgbOne.ToHSL(),
 		rgbTwo.ToHSL(),
 		rgbThree.ToHSL(),
@@ -215,7 +219,8 @@ func gradientDump() {
 	}
 	fmt.Println()
 
-	nearestHslGradient := color.NearestHSLGradient(between,
+	nearestHslGradient := color.HSLGradient(between,
+		color.HueDistanceNearest,
 		rgbOne.ToHSL(),
 		rgbTwo.ToHSL(),
 		rgbThree.ToHSL(),
@@ -226,6 +231,7 @@ func gradientDump() {
 	fmt.Println()
 
 	hsvGradient := color.HSVGradient(between,
+		color.HueDistanceCW,
 		rgbOne.ToHSV(),
 		rgbTwo.ToHSV(),
 		rgbThree.ToHSV(),
@@ -235,7 +241,8 @@ func gradientDump() {
 	}
 	fmt.Println()
 
-	reverseHsvGradient := color.ReverseHSVGradient(between,
+	reverseHsvGradient := color.HSVGradient(between,
+		color.HueDistanceCCW,
 		rgbOne.ToHSV(),
 		rgbTwo.ToHSV(),
 		rgbThree.ToHSV(),
@@ -245,7 +252,8 @@ func gradientDump() {
 	}
 	fmt.Println()
 
-	nearestHsvGradient := color.NearestHSVGradient(between,
+	nearestHsvGradient := color.HSVGradient(between,
+		color.HueDistanceNearest,
 		rgbOne.ToHSV(),
 		rgbTwo.ToHSV(),
 		rgbThree.ToHSV(),
