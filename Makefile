@@ -1,5 +1,4 @@
 .PHONEY: test
 test:
-	go install
-	colorizer > test.txt
-	code test.txt
+	go run main.go > out.txt
+	code out.txt

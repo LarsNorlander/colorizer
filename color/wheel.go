@@ -1,5 +1,9 @@
 package color
 
+import (
+	"math"
+)
+
 // A circular, doubly linked list representing the color wheel
 //goland:noinspection GoNameStartsWithPackageName
 type ColorWheel struct {
@@ -30,80 +34,6 @@ func NewColorWheel() *ColorWheel {
 	return &cw
 }
 
-func GenerateColorWheel(r RGB, g RGB, b RGB) *ColorWheel {
-	const (
-		Red = iota
-		Orange
-		Yellow
-		YellowGreen
-		Green
-		GreenCyan
-		Cyan
-		CyanBlue
-		Blue
-		BlueMagenta
-		Magenta
-		MagentaRed
-	)
-
-	red := r.ToHSL()
-	green := g.ToHSL()
-	blue := b.ToHSL()
-
-	cw := NewColorWheel()
-
-	// Set RGB
-	cw.Jump(Red)
-	cw.Set(r)
-
-	cw.Jump(Green)
-	cw.Set(g)
-
-	cw.Jump(Blue)
-	cw.Set(b)
-
-	cw.Jump(Yellow)
-	yellow := HSLGradient(1, red, green)[1]
-	cw.Set(yellow.ToRGB())
-
-	cw.Jump(Cyan)
-	cyan := HSLGradient(1, green, blue)[1]
-	cw.Set(cyan.ToRGB())
-
-	cw.Jump(Magenta)
-	magenta := HSLGradient(1, blue, red)[1]
-	cw.Set(magenta.ToRGB())
-
-	// Set Tertiary
-	cw.Jump(Orange)
-	orange := HSLGradient(1, red, yellow)[1]
-	cw.Set(orange.ToRGB())
-
-	cw.Jump(YellowGreen)
-	greenYellow := HSLGradient(1, yellow, green)[1]
-	cw.Set(greenYellow.ToRGB())
-
-	cw.Jump(GreenCyan)
-	greenCyan := HSLGradient(1, green, cyan)[1]
-	cw.Set(greenCyan.ToRGB())
-
-	cw.Jump(CyanBlue)
-	cyanBlue := HSLGradient(1, cyan, blue)[1]
-	cw.Set(cyanBlue.ToRGB())
-
-	cw.Jump(BlueMagenta)
-	blueMagenta := HSLGradient(1, blue, magenta)[1]
-	cw.Set(blueMagenta.ToRGB())
-
-	cw.Jump(MagentaRed)
-	magentaRed := HSLGradient(1, magenta, red)[1]
-	cw.Set(magentaRed.ToRGB())
-
-	cw.Jump(Red) // Reset pointer
-
-	return cw
-}
-
 // Moves current pointer to the next value, and returns it
 func (cw *ColorWheel) Next() RGB {
 	cw.current = cw.current.next
@@ -121,9 +51,50 @@ func (cw *ColorWheel) Get() RGB {
 	return cw.current.value
 }
 
+// Get the value at a specific index
+func (cw *ColorWheel) GetAt(index int) RGB {
+	if index < 0 || index >= cw.size {
+		panic("index out of bounds")
+	}
+	current := cw.start
+	for i := 0; i < index; i++ {
+		current = current.next
+	}
+	return current.value
+}
+
+func (cw *ColorWheel) getNodeAt(index int) *node {
+	if index < 0 || index >= cw.size {
+		panic("index out of bounds")
+	}
+	current := cw.start
+	for i := 0; i < index; i++ {
+		current = current.next
+	}
+	return current
+}
+
 // Set a new value for the current pointer
+// TODO Implement set, so that it blends the colors next to it
 func (cw *ColorWheel) Set(rgb RGB) {
 	cw.current.value = rgb
+}
+
+// Grab the RGB value at a specific point in the color wheel.
+func (cw *ColorWheel) Sample(degrees float64) RGB {
+	degrees = normalizeDegrees(degrees)
+
+	index := int(math.Floor(degrees / 30))
+	start := cw.getNodeAt(index)
+
+	blendPercentage := (degrees - (float64(index) * 30)) / 30
+
+	return PartialBlendHSL(
+		start.value.ToHSL(),
+		start.next.value.ToHSL(),
+		blendPercentage,
+		HueDistanceCW, // In the future, look up the resolution strategy of the section
+	).ToRGB()
 }
 
 // Move the pointer to the specified index and return the value in it, does not roll over
@@ -139,7 +110,7 @@ func (cw *ColorWheel) Jump(index int) RGB {
 }
 
 func (cw ColorWheel) String() string {
-	str := ""
+	str := "["
 	cur := cw.start
 	for {
 		str += cur.value.ToHex().String()
@@ -147,7 +118,9 @@ func (cw ColorWheel) String() string {
 		if cur == cw.start {
 			break
 		}
+		str += " "
 	}
+	str += "]"
 	return str
 }
 

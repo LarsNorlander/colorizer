@@ -10,8 +10,12 @@ type HSV struct {
 	S, V float64
 }
 
-func (hsv HSV) String() string {
+func (hsv HSV) FormalString() string {
 	return fmt.Sprintf("hsv(%f, %f, %f)", hsv.H, hsv.S, hsv.V)
+}
+
+func (hsv HSV) String() string {
+	return hsv.ToRGB().ToHex().String()
 }
 
 func (rgb RGB) ToHSV() HSV {
@@ -40,59 +44,32 @@ func (hsv HSV) ToRGB() RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func HSVGradient(between int, hsv ...HSV) []HSV {
-	return hsvGradientHelper(
-		HueDistanceCW,
-		between,
-		hsv...,
-	)
+func PartialBlendHSV(x HSV, y HSV, percentage float64, strategy HueDistanceSolver) HSV {
+	distance := strategy(x.H, y.H)
+	movement := distance * percentage
+
+	return HSV{
+		H: MoveHue(x.H, movement),
+		S: wavg(x.S, y.S, percentage),
+		V: wavg(x.V, y.V, percentage),
+	}
 }
 
-func ReverseHSVGradient(between int, hsv ...HSV) []HSV {
-	return hsvGradientHelper(
-		HueDistanceCCW,
-		between,
-		hsv...,
-	)
-}
+func HSVGradient(between int, strategy HueDistanceSolver, hsv ...HSV) []HSV {
+	grad := make([]HSV, len(hsv)+(between*(len(hsv)-1)))
 
-func NearestHSVGradient(between int, hsv ...HSV) []HSV {
-	return hsvGradientHelper(
-		HueDistanceNearest,
-		between,
-		hsv...,
-	)
-}
+	steps := float64(between) + 1
+	weight := 1.0 / steps
 
-func hsvGradientHelper(
-	hueStepCalc func(from Hue, to Hue) float64,
-	between int,
-	hsv ...HSV,
-) []HSV {
-	hsvLen := len(hsv)
-	grad := make([]HSV, hsvLen+(between*(hsvLen-1)))
-	stepCount := between + 1
-
-	grad[len(grad)-1] = hsv[hsvLen-1]
-
-	for i := 0; i < hsvLen-1; i++ {
-		x := hsv[i]
-		y := hsv[i+1]
-
-		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
-		sStep := calcStep(x.S, y.S, stepCount)
-		lStep := calcStep(x.V, y.V, stepCount)
-
-		hCur := x.H
-		sCur := x.S
-		lCur := x.V
-
-		for j := 0; j < stepCount; j++ {
-			offset := i * stepCount
-			grad[j+offset] = HSV{hCur, sCur, lCur}
-			hCur = MoveHue(hCur, hStep)
-			sCur += sStep
-			lCur += lStep
+	grad[0] = hsv[0]
+	for i := 0; i < len(hsv)-1; i++ {
+		ca := hsv[i]
+		cb := hsv[i+1]
+		curWeight := 0.0
+		offset := i * (between + 1)
+		for j := 0; j < between+2; j++ {
+			grad[j+offset] = PartialBlendHSV(ca, cb, curWeight, strategy)
+			curWeight += weight
 		}
 	}
 

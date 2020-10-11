@@ -10,8 +10,12 @@ type HSL struct {
 	S, L float64
 }
 
-func (hsl HSL) String() string {
+func (hsl HSL) FormalString() string {
 	return fmt.Sprintf("hsl(%f, %f, %f)", hsl.H, hsl.S, hsl.L)
+}
+
+func (hsl HSL) String() string {
+	return hsl.ToRGB().ToHex().String()
 }
 
 func (rgb RGB) ToHSL() HSL {
@@ -48,58 +52,36 @@ func (hsl HSL) ToRGB() RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func HSLGradient(between int, hsl ...HSL) []HSL {
-	return hslGradientHelper(
-		HueDistanceCW,
-		between,
-		hsl...,
-	)
+func BlendHSL(x HSL, y HSL, strategy HueDistanceSolver) HSL {
+	return PartialBlendHSL(x, y, 0.5, strategy)
 }
 
-func ReverseHSLGradient(between int, hsl ...HSL) []HSL {
-	return hslGradientHelper(
-		HueDistanceCCW,
-		between,
-		hsl...,
-	)
+func PartialBlendHSL(x HSL, y HSL, percentage float64, strategy HueDistanceSolver) HSL {
+	distance := strategy(x.H, y.H)
+	movement := distance * percentage
+
+	return HSL{
+		H: MoveHue(x.H, movement),
+		S: wavg(x.S, y.S, percentage),
+		L: wavg(x.L, y.L, percentage),
+	}
 }
 
-func NearestHSLGradient(between int, hsl ...HSL) []HSL {
-	return hslGradientHelper(
-		HueDistanceNearest,
-		between,
-		hsl...,
-	)
-}
+func HSLGradient(between int, strategy HueDistanceSolver, hsl ...HSL) []HSL {
+	grad := make([]HSL, len(hsl)+(between*(len(hsl)-1)))
 
-func hslGradientHelper(
-	hueStepCalc func(from Hue, to Hue) float64,
-	between int, hsl ...HSL,
-) []HSL {
-	hslLen := len(hsl)
-	grad := make([]HSL, hslLen+(between*(hslLen-1)))
-	stepCount := between + 1
+	steps := float64(between) + 1
+	weight := 1.0 / steps
 
-	grad[len(grad)-1] = hsl[hslLen-1]
-
-	for i := 0; i < hslLen-1; i++ {
-		x := hsl[i]
-		y := hsl[i+1]
-
-		hStep := hueStepCalc(x.H, y.H) / float64(stepCount)
-		sStep := calcStep(x.S, y.S, stepCount)
-		lStep := calcStep(x.L, y.L, stepCount)
-
-		hCur := x.H
-		sCur := x.S
-		lCur := x.L
-
-		for j := 0; j < stepCount; j++ {
-			offset := i * stepCount
-			grad[j+offset] = HSL{hCur, sCur, lCur}
-			hCur = MoveHue(hCur, hStep)
-			sCur += sStep
-			lCur += lStep
+	grad[0] = hsl[0]
+	for i := 0; i < len(hsl)-1; i++ {
+		ca := hsl[i]
+		cb := hsl[i+1]
+		curWeight := 0.0
+		offset := i * (between + 1)
+		for j := 0; j < between+2; j++ {
+			grad[j+offset] = PartialBlendHSL(ca, cb, curWeight, strategy)
+			curWeight += weight
 		}
 	}
 

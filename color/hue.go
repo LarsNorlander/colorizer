@@ -46,6 +46,8 @@ func MoveHue(hue Hue, delta float64) Hue {
 	}
 }
 
+type HueDistanceSolver func(Hue, Hue) float64
+
 func HueDistanceCW(from Hue, to Hue) float64 {
 	from.MustBeValid()
 	to.MustBeValid()
