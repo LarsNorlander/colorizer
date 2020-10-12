@@ -12,11 +12,11 @@ var (
 	blackHueLine = lineFromPoints(blackPoint, huePoint)
 )
 
-func MapToWold(cw *ColorWheel, blk Color, wht Color, source RGB) Color {
-	src := source.HSL()
+func MapToWold(hues *ColorWheel, black Color, white Color, input Color) Color {
+	src := input.RGB().HSL()
 
-	pureHue := cw.Sample(src.H.Val)
-	lumSample := PartialHSLBlend(blk, wht, src.L, HueDistanceCW).RGB()
+	pureHue := hues.Sample(src.H.Val)
+	lumSample := PartialHSLBlend(black, white, src.L, HueDistanceCW).RGB()
 	lumLine := Line{Slope: 0, YIntercept: src.L}
 
 	if src.L == 0.5 {
@@ -24,12 +24,12 @@ func MapToWold(cw *ColorWheel, blk Color, wht Color, source RGB) Color {
 	} else if src.L > 0.5 {
 		inter := intersect(lumLine, whiteHueLine)
 		dist := distanceBetweenPoints(inter, whitePoint)
-		mixer := PartialRGBBlend(wht, pureHue, dist)
+		mixer := PartialRGBBlend(white, pureHue, dist)
 		return PartialRGBBlend(lumSample, mixer, src.S)
 	} else {
 		inter := intersect(lumLine, blackHueLine)
 		dist := distanceBetweenPoints(inter, blackPoint)
-		mixer := PartialRGBBlend(blk, pureHue, dist)
+		mixer := PartialRGBBlend(black, pureHue, dist)
 		return PartialRGBBlend(lumSample, mixer, src.S)
 	}
 }

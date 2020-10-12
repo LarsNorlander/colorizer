@@ -23,6 +23,26 @@ type Hue struct {
 	Val float64 // a value that must be in the range of [0, 360)
 }
 
+func (rgb RGB) Hue() Hue {
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
+	c := max - min
+
+	var hP float64
+	switch max {
+	case rgb.R:
+		hP = math.Mod((rgb.G-rgb.B)/c, 6)
+	case rgb.G:
+		hP = ((rgb.B - rgb.R) / c) + 2
+	case rgb.B:
+		hP = ((rgb.R - rgb.G) / c) + 4
+	}
+
+	h := hP * 60
+
+	return NewHue(h)
+}
+
 func (hue Hue) IsValid() bool {
 	return hue.Val >= 0 && hue.Val < 360
 }
@@ -102,26 +122,6 @@ func normalizeDegrees(val float64) float64 {
 		val += 360 + (360 * rev)
 	}
 	return val
-}
-
-func (rgb RGB) Hue() Hue {
-	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
-	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
-	c := max - min
-
-	var hP float64
-	switch max {
-	case rgb.R:
-		hP = math.Mod((rgb.G-rgb.B)/c, 6)
-	case rgb.G:
-		hP = ((rgb.B - rgb.R) / c) + 2
-	case rgb.B:
-		hP = ((rgb.R - rgb.G) / c) + 4
-	}
-
-	h := hP * 60
-
-	return NewHue(h)
 }
 
 func computeRGB(c, x, hP, m float64) RGB {

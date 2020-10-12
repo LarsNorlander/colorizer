@@ -176,13 +176,7 @@ func gradientDump() {
 	between := 9
 
 	hsl := rgbTwo.HSL()
-	lightnessGradient := color.LightnessGradient(
-		hsl.H,
-		hsl.S,
-		19,
-		0,
-		0,
-	)
+	lightnessGradient := color.HSLLumGradient(hsl.H, hsl.S, 0, 0, 19)
 	for i := range lightnessGradient {
 		fmt.Print(lightnessGradient[i].RGB().Hex())
 	}

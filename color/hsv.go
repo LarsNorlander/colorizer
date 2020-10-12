@@ -11,7 +11,7 @@ type HSV struct {
 }
 
 func (hsv HSV) String() string {
-	return fmt.Sprintf("hsv(%f, %f, %f)", hsv.H, hsv.S, hsv.V)
+	return fmt.Sprintf("hsv(%s, %.1f%%, %.1f%%)", hsv.H, hsv.S, hsv.V)
 }
 
 func (rgb RGB) HSV() HSV {

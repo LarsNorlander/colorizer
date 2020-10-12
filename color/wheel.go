@@ -4,14 +4,6 @@ import (
 	"math"
 )
 
-// A circular, doubly linked list representing the color wheel
-//goland:noinspection GoNameStartsWithPackageName
-type ColorWheel struct {
-	start   *node
-	current *node
-	size    int
-}
-
 func NewColorWheel() *ColorWheel {
 	start := &node{}
 	cw := ColorWheel{
@@ -32,6 +24,20 @@ func NewColorWheel() *ColorWheel {
 	start.previous = prev
 
 	return &cw
+}
+
+// A circular, doubly linked list representing the color wheel
+//goland:noinspection GoNameStartsWithPackageName
+type ColorWheel struct {
+	start   *node
+	current *node
+	size    int
+}
+
+type node struct {
+	previous *node
+	value    Color
+	next     *node
 }
 
 // Moves current pointer to the next value, and returns it
@@ -122,10 +128,4 @@ func (cw ColorWheel) String() string {
 	}
 	str += "]"
 	return str
-}
-
-type node struct {
-	previous *node
-	value    Color
-	next     *node
 }

@@ -1,8 +1,8 @@
 package color
 
 import (
-	"fmt"
-	"math"
+	. "fmt"
+	. "math"
 )
 
 type HSL struct {
@@ -10,13 +10,9 @@ type HSL struct {
 	S, L float64
 }
 
-func (hsl HSL) String() string {
-	return fmt.Sprintf("hsl(%.1f\u00B0, %.1f%%, %.1f%%)", hsl.H.Val, hsl.S*100, hsl.L*100)
-}
-
 func (rgb RGB) HSL() HSL {
-	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
-	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
+	min := Min(Min(rgb.R, rgb.G), rgb.B)
+	max := Max(Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 	l := (max + min) / 2
 
@@ -34,18 +30,22 @@ func (rgb RGB) HSL() HSL {
 	if l == 0 || l == 1 {
 		s = 0
 	} else {
-		s = c / (1 - math.Abs(2*l-1))
+		s = c / (1 - Abs(2*l-1))
 	}
 
 	return HSL{H: h, S: s, L: l}
 }
 
 func (hsl HSL) RGB() RGB {
-	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
+	c := (1 - Abs(2*hsl.L-1)) * hsl.S
 	hP := hsl.H.Val / 60
-	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
+	x := c * (1 - Abs(Mod(hP, 2)-1))
 	m := hsl.L - c/2
 	return computeRGB(c, x, hP, m)
+}
+
+func (hsl HSL) String() string {
+	return Sprintf("hsl(%s, %.1f%%, %.1f%%)", hsl.H, hsl.S*100, hsl.L*100)
 }
 
 func HSLBlend(a Color, b Color, strategy HueDistanceSolver) Color {
@@ -87,7 +87,7 @@ func HSLGradient(between int, strategy HueDistanceSolver, colors ...Color) []Col
 	return grad
 }
 
-func LightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []Color {
+func HSLLumGradient(h Hue, s, darkClip, lightClip float64, between int) []Color {
 	grad := make([]Color, 2+between)
 	stepCount := between + 1
 

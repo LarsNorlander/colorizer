@@ -25,6 +25,12 @@ func (l Line) String() string {
 	}
 }
 
+func wavg(x, y, w float64) float64 {
+	xWeight := 1 - w
+	yWeight := 1 - xWeight
+	return (x * xWeight) + (y*yWeight)/1
+}
+
 func slope(a, b Point) float64 {
 	return (b.Y - a.Y) / (b.X - a.X)
 }
@@ -59,10 +65,4 @@ func areaEqTriangle(side float64) float64 {
 
 func triangleHeight(base float64, area float64) float64 {
 	return 2 * (area / base)
-}
-
-func wavg(x, y, w float64) float64 {
-	xWeight := 1 - w
-	yWeight := 1 - xWeight
-	return (x * xWeight) + (y*yWeight)/1
 }

@@ -15,10 +15,10 @@ func main() {
 	// Primary Colors
 	red := MustParseHex("#FF0000")
 	green := MustParseHex("#00FF00")
-	blue := MustParseHex("#0000ff")
+	blue := MustParseHex("#0000FF")
 	// Shades
 	black := MustParseHex("#000000")
-	white := MustParseHex("#ffffff")
+	white := MustParseHex("#FFFFFF")
 	// Calculate the color wheel
 	cw := GenerateColorWheel(red, green, blue)
 
@@ -39,6 +39,9 @@ func main() {
 
 	_, _ = inputImg.Seek(0, 0)
 	img, _, err := image.Decode(inputImg)
+	if err != nil {
+		panic(err)
+	}
 
 	upLeft := image.Point{}
 	lowRight := image.Point{X: width, Y: height}
