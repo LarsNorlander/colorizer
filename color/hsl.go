@@ -1,7 +1,7 @@
 package color
 
 import (
-	. "fmt"
+	"fmt"
 	. "math"
 )
 
@@ -45,7 +45,7 @@ func (hsl HSL) RGB() RGB {
 }
 
 func (hsl HSL) String() string {
-	return Sprintf("hsl(%s, %.1f%%, %.1f%%)", hsl.H, hsl.S*100, hsl.L*100)
+	return fmt.Sprintf("hsl(%s, %.1f%%, %.1f%%)", hsl.H, hsl.S*100, hsl.L*100)
 }
 
 func HSLBlend(a Color, b Color, strategy HueDistanceSolver) Color {

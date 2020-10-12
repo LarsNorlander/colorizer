@@ -2,7 +2,7 @@ package color
 
 import (
 	"fmt"
-	"math"
+	. "math"
 )
 
 type Point struct {
@@ -19,7 +19,7 @@ type Line struct {
 
 func (l Line) String() string {
 	if l.YIntercept < 0 {
-		return fmt.Sprintf("y = %fx - %f", l.Slope, math.Abs(l.YIntercept))
+		return fmt.Sprintf("y = %fx - %f", l.Slope, Abs(l.YIntercept))
 	} else {
 		return fmt.Sprintf("y = %fx + %f", l.Slope, l.YIntercept)
 	}
@@ -56,11 +56,11 @@ func lineFromPoints(a, b Point) Line {
 }
 
 func distanceBetweenPoints(a, b Point) float64 {
-	return math.Sqrt(math.Pow(b.X-a.X, 2) + math.Pow(b.Y-a.Y, 2))
+	return Sqrt(Pow(b.X-a.X, 2) + Pow(b.Y-a.Y, 2))
 }
 
 func areaEqTriangle(side float64) float64 {
-	return (math.Sqrt(3) / 4) * math.Pow(side, 2)
+	return (Sqrt(3) / 4) * Pow(side, 2)
 }
 
 func triangleHeight(base float64, area float64) float64 {
