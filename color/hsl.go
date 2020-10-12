@@ -10,15 +10,11 @@ type HSL struct {
 	S, L float64
 }
 
-func (hsl HSL) FormalString() string {
-	return fmt.Sprintf("hsl(%.1f\u00B0, %.1f%%, %.1f%%)", hsl.H.Val, hsl.S * 100, hsl.L * 100)
-}
-
 func (hsl HSL) String() string {
-	return hsl.ToRGB().ToHex().String()
+	return fmt.Sprintf("hsl(%.1f\u00B0, %.1f%%, %.1f%%)", hsl.H.Val, hsl.S*100, hsl.L*100)
 }
 
-func (rgb RGB) ToHSL() HSL {
+func (rgb RGB) HSL() HSL {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
@@ -32,7 +28,7 @@ func (rgb RGB) ToHSL() HSL {
 		}
 	}
 
-	h := rgb.ToHue()
+	h := rgb.Hue()
 
 	var s float64
 	if l == 0 || l == 1 {
@@ -44,7 +40,7 @@ func (rgb RGB) ToHSL() HSL {
 	return HSL{H: h, S: s, L: l}
 }
 
-func (hsl HSL) ToRGB() RGB {
+func (hsl HSL) RGB() RGB {
 	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
 	hP := hsl.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
@@ -52,11 +48,14 @@ func (hsl HSL) ToRGB() RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func BlendHSL(x HSL, y HSL, strategy HueDistanceSolver) HSL {
-	return PartialBlendHSL(x, y, 0.5, strategy)
+func HSLBlend(a Color, b Color, strategy HueDistanceSolver) Color {
+	return PartialHSLBlend(a, b, 0.5, strategy)
 }
 
-func PartialBlendHSL(x HSL, y HSL, percentage float64, strategy HueDistanceSolver) HSL {
+func PartialHSLBlend(a Color, b Color, percentage float64, strategy HueDistanceSolver) Color {
+	x := a.RGB().HSL()
+	y := b.RGB().HSL()
+
 	distance := strategy(x.H, y.H)
 	movement := distance * percentage
 
@@ -67,20 +66,20 @@ func PartialBlendHSL(x HSL, y HSL, percentage float64, strategy HueDistanceSolve
 	}
 }
 
-func HSLGradient(between int, strategy HueDistanceSolver, hsl ...HSL) []HSL {
-	grad := make([]HSL, len(hsl)+(between*(len(hsl)-1)))
+func HSLGradient(between int, strategy HueDistanceSolver, colors ...Color) []Color {
+	grad := make([]Color, len(colors)+(between*(len(colors)-1)))
 
 	steps := float64(between) + 1
 	weight := 1.0 / steps
 
-	grad[0] = hsl[0]
-	for i := 0; i < len(hsl)-1; i++ {
-		ca := hsl[i]
-		cb := hsl[i+1]
+	grad[0] = colors[0]
+	for i := 0; i < len(colors)-1; i++ {
+		ca := colors[i]
+		cb := colors[i+1]
 		curWeight := 0.0
 		offset := i * (between + 1)
 		for j := 0; j < between+2; j++ {
-			grad[j+offset] = PartialBlendHSL(ca, cb, curWeight, strategy)
+			grad[j+offset] = PartialHSLBlend(ca, cb, curWeight, strategy)
 			curWeight += weight
 		}
 	}
@@ -88,11 +87,11 @@ func HSLGradient(between int, strategy HueDistanceSolver, hsl ...HSL) []HSL {
 	return grad
 }
 
-func LightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []HSL {
-	grad := make([]HSL, 2+between)
+func LightnessGradient(h Hue, s float64, between int, darkClip, lightClip float64) []Color {
+	grad := make([]Color, 2+between)
 	stepCount := between + 1
 
-	lStep := calcStep(0+darkClip, 1-lightClip, stepCount)
+	lStep := ((0 + darkClip) - (1 - lightClip)) / float64(stepCount)
 
 	lCur := 0.0 + darkClip
 

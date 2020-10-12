@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/LarsNorlander/colorizer/color"
 	"math/rand"
+
+	"github.com/LarsNorlander/colorizer/color"
 )
 
 func main() {
@@ -48,12 +49,12 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Printf("blu: %s\n", b)
 	fmt.Println()
 
-	black := color.MustParseHex(blk).ToRGB()
-	white := color.MustParseHex(wht).ToRGB()
+	black := color.MustParseHex(blk).RGB()
+	white := color.MustParseHex(wht).RGB()
 
-	red := color.MustParseHex(r).ToRGB()
-	green := color.MustParseHex(g).ToRGB()
-	blue := color.MustParseHex(b).ToRGB()
+	red := color.MustParseHex(r).RGB()
+	green := color.MustParseHex(g).RGB()
+	blue := color.MustParseHex(b).RGB()
 
 	cw := color.GenerateColorWheel(
 		red,
@@ -66,9 +67,9 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	fmt.Println("Shades (Black to White):")
-	lightnessGrad := color.HSLGradient(11, color.HueDistanceNearest, black.ToHSL(), white.ToHSL())
+	lightnessGrad := color.HSLGradient(11, color.HueDistanceNearest, black.HSL(), white.HSL())
 	for i := range lightnessGrad {
-		fmt.Print(lightnessGrad[i].ToRGB().ToHex())
+		fmt.Print(lightnessGrad[i].RGB().Hex())
 	}
 	fmt.Println()
 	fmt.Println()
@@ -81,7 +82,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 			white,
 		)
 		for i := range grad {
-			fmt.Print(grad[i].ToHex())
+			fmt.Print(grad[i])
 		}
 		fmt.Println()
 		cw.Next()
@@ -93,7 +94,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	for i := 0; i < 12; i++ {
 		grad := color.RGBGradient(11, cw.Get(), black)
 		for i := range grad {
-			fmt.Print(grad[i].ToHex())
+			fmt.Print(grad[i])
 		}
 		fmt.Println()
 		cw.Next()
@@ -105,7 +106,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	for i := 0; i < 12; i++ {
 		grad := color.RGBGradient(11, cw.Get(), white)
 		for i := range grad {
-			fmt.Print(grad[i].ToHex())
+			fmt.Print(grad[i])
 		}
 		fmt.Println()
 		cw.Next()
@@ -113,12 +114,12 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	fmt.Println("Tone table (Pure Hue to Gray):")
-	gray := color.HSLGradient(1, color.HueDistanceNearest, black.ToHSL(), white.ToHSL())[1].ToRGB()
+	gray := color.HSLGradient(1, color.HueDistanceNearest, black.HSL(), white.HSL())[1].RGB()
 	cw.Jump(0)
 	for i := 0; i < 12; i++ {
 		grad := color.RGBGradient(11, cw.Get(), gray)
 		for i := range grad {
-			fmt.Print(grad[i].ToHex())
+			fmt.Print(grad[i])
 		}
 		fmt.Println()
 		cw.Next()
@@ -126,14 +127,14 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	fmt.Println()
 
 	cw.Jump(0)
-	lightnessGrad = color.HSLGradient(11, color.HueDistanceNearest, white.ToHSL(), black.ToHSL())
+	lightnessGrad = color.HSLGradient(11, color.HueDistanceNearest, white.HSL(), black.HSL())
 	for i := 0; i < 12; i++ {
 		val := cw.Get()
-		fmt.Printf("HSL Table for %s:\n", val.ToHex())
+		fmt.Printf("HSL Table for %s:\n", val)
 		for i := range lightnessGrad {
-			grad := color.RGBGradient(11, lightnessGrad[i].ToRGB(), val)
+			grad := color.RGBGradient(11, lightnessGrad[i].RGB(), val)
 			for i := range grad {
-				fmt.Print(grad[i].ToHex())
+				fmt.Print(grad[i])
 			}
 			fmt.Println()
 		}
@@ -145,12 +146,12 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 
 func rgbGradientTest() {
 	grad := color.RGBGradient(3,
-		color.MustParseHex("#1a1f27").ToRGB(),
-		color.MustParseHex("#36FF00").ToRGB(),
-		color.MustParseHex("#f7f8fa").ToRGB(),
+		color.MustParseHex("#1a1f27").RGB(),
+		color.MustParseHex("#36FF00").RGB(),
+		color.MustParseHex("#f7f8fa").RGB(),
 	)
 	for i := range grad {
-		fmt.Print(grad[i].ToHex())
+		fmt.Print(grad[i])
 	}
 	fmt.Println()
 }
@@ -158,23 +159,23 @@ func rgbGradientTest() {
 func hueGradientTest() {
 	grad := color.HSLGradient(1,
 		color.HueDistanceNearest,
-		[]color.HSL{
-			color.MustParseHex("#FFDE00").ToRGB().ToHSL(),
-			color.MustParseHex("#00FFB3").ToRGB().ToHSL(),
+		[]color.Color{
+			color.MustParseHex("#FFDE00"),
+			color.MustParseHex("#00FFB3"),
 		}...)
 	for i := range grad {
-		fmt.Print(grad[i].ToRGB().ToHex())
+		fmt.Print(grad[i].RGB().Hex())
 	}
 	fmt.Println()
 }
 
 func gradientDump() {
-	rgbOne := randHex().ToRGB()
-	rgbTwo := randHex().ToRGB()
-	rgbThree := randHex().ToRGB()
+	rgbOne := randHex().RGB()
+	rgbTwo := randHex().RGB()
+	rgbThree := randHex().RGB()
 	between := 9
 
-	hsl := rgbTwo.ToHSL()
+	hsl := rgbTwo.HSL()
 	lightnessGradient := color.LightnessGradient(
 		hsl.H,
 		hsl.S,
@@ -183,7 +184,7 @@ func gradientDump() {
 		0,
 	)
 	for i := range lightnessGradient {
-		fmt.Print(lightnessGradient[i].ToRGB().ToHex())
+		fmt.Print(lightnessGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
@@ -193,73 +194,73 @@ func gradientDump() {
 		rgbThree,
 	)
 	for i := range rgbGradient {
-		fmt.Print(rgbGradient[i].ToHex())
+		fmt.Print(rgbGradient[i])
 	}
 	fmt.Println()
 
 	hslGradient := color.HSLGradient(between,
 		color.HueDistanceCW,
-		rgbOne.ToHSL(),
-		rgbTwo.ToHSL(),
-		rgbThree.ToHSL(),
+		rgbOne.HSL(),
+		rgbTwo.HSL(),
+		rgbThree.HSL(),
 	)
 	for i := range hslGradient {
-		fmt.Print(hslGradient[i].ToRGB().ToHex())
+		fmt.Print(hslGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
 	reverseHslGradient := color.HSLGradient(between,
 		color.HueDistanceCCW,
-		rgbOne.ToHSL(),
-		rgbTwo.ToHSL(),
-		rgbThree.ToHSL(),
+		rgbOne.HSL(),
+		rgbTwo.HSL(),
+		rgbThree.HSL(),
 	)
 	for i := range reverseHslGradient {
-		fmt.Print(reverseHslGradient[i].ToRGB().ToHex())
+		fmt.Print(reverseHslGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
 	nearestHslGradient := color.HSLGradient(between,
 		color.HueDistanceNearest,
-		rgbOne.ToHSL(),
-		rgbTwo.ToHSL(),
-		rgbThree.ToHSL(),
+		rgbOne.HSL(),
+		rgbTwo.HSL(),
+		rgbThree.HSL(),
 	)
 	for i := range nearestHslGradient {
-		fmt.Print(nearestHslGradient[i].ToRGB().ToHex())
+		fmt.Print(nearestHslGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
 	hsvGradient := color.HSVGradient(between,
 		color.HueDistanceCW,
-		rgbOne.ToHSV(),
-		rgbTwo.ToHSV(),
-		rgbThree.ToHSV(),
+		rgbOne.HSV(),
+		rgbTwo.HSV(),
+		rgbThree.HSV(),
 	)
 	for i := range hsvGradient {
-		fmt.Print(hsvGradient[i].ToRGB().ToHex())
+		fmt.Print(hsvGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
 	reverseHsvGradient := color.HSVGradient(between,
 		color.HueDistanceCCW,
-		rgbOne.ToHSV(),
-		rgbTwo.ToHSV(),
-		rgbThree.ToHSV(),
+		rgbOne.HSV(),
+		rgbTwo.HSV(),
+		rgbThree.HSV(),
 	)
 	for i := range reverseHsvGradient {
-		fmt.Print(reverseHsvGradient[i].ToRGB().ToHex())
+		fmt.Print(reverseHsvGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 
 	nearestHsvGradient := color.HSVGradient(between,
 		color.HueDistanceNearest,
-		rgbOne.ToHSV(),
-		rgbTwo.ToHSV(),
-		rgbThree.ToHSV(),
+		rgbOne.HSV(),
+		rgbTwo.HSV(),
+		rgbThree.HSV(),
 	)
 	for i := range nearestHsvGradient {
-		fmt.Print(nearestHsvGradient[i].ToRGB().ToHex())
+		fmt.Print(nearestHsvGradient[i].RGB().Hex())
 	}
 	fmt.Println()
 }

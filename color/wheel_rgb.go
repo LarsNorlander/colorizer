@@ -1,6 +1,6 @@
 package color
 
-func GenerateColorWheel(r RGB, g RGB, b RGB) *ColorWheel {
+func GenerateColorWheel(red Color, green Color, blue Color) *ColorWheel {
 	const (
 		Red = iota
 		Orange
@@ -16,58 +16,54 @@ func GenerateColorWheel(r RGB, g RGB, b RGB) *ColorWheel {
 		MagentaRed
 	)
 
-	red := r.ToHSL()
-	green := g.ToHSL()
-	blue := b.ToHSL()
-
 	cw := NewColorWheel()
 
 	// Set RGB
 	cw.Jump(Red)
-	cw.Set(r)
+	cw.Set(red)
 
 	cw.Jump(Green)
-	cw.Set(g)
+	cw.Set(green)
 
 	cw.Jump(Blue)
-	cw.Set(b)
+	cw.Set(blue)
 
 	cw.Jump(Yellow)
-	yellow := BlendHSL(red, green, HueDistanceCW)
-	cw.Set(yellow.ToRGB())
+	yellow := HSLBlend(red, green, HueDistanceCW)
+	cw.Set(yellow)
 
 	cw.Jump(Cyan)
-	cyan := BlendHSL(green, blue, HueDistanceCW)
-	cw.Set(cyan.ToRGB())
+	cyan := HSLBlend(green, blue, HueDistanceCW)
+	cw.Set(cyan)
 
 	cw.Jump(Magenta)
-	magenta := BlendHSL(blue, red, HueDistanceCW)
-	cw.Set(magenta.ToRGB())
+	magenta := HSLBlend(blue, red, HueDistanceCW)
+	cw.Set(magenta)
 
 	// Set Tertiary
 	cw.Jump(Orange)
-	orange := BlendHSL(red, yellow, HueDistanceCW)
-	cw.Set(orange.ToRGB())
+	orange := HSLBlend(red, yellow, HueDistanceCW)
+	cw.Set(orange)
 
 	cw.Jump(YellowGreen)
-	greenYellow := BlendHSL(yellow, green, HueDistanceCW)
-	cw.Set(greenYellow.ToRGB())
+	greenYellow := HSLBlend(yellow, green, HueDistanceCW)
+	cw.Set(greenYellow)
 
 	cw.Jump(GreenCyan)
-	greenCyan := BlendHSL(green, cyan, HueDistanceCW)
-	cw.Set(greenCyan.ToRGB())
+	greenCyan := HSLBlend(green, cyan, HueDistanceCW)
+	cw.Set(greenCyan)
 
 	cw.Jump(CyanBlue)
-	cyanBlue := BlendHSL(cyan, blue, HueDistanceCW)
-	cw.Set(cyanBlue.ToRGB())
+	cyanBlue := HSLBlend(cyan, blue, HueDistanceCW)
+	cw.Set(cyanBlue)
 
 	cw.Jump(BlueMagenta)
-	blueMagenta := BlendHSL(blue, magenta, HueDistanceCW)
-	cw.Set(blueMagenta.ToRGB())
+	blueMagenta := HSLBlend(blue, magenta, HueDistanceCW)
+	cw.Set(blueMagenta)
 
 	cw.Jump(MagentaRed)
-	magentaRed := BlendHSL(magenta, red, HueDistanceCW)
-	cw.Set(magentaRed.ToRGB())
+	magentaRed := HSLBlend(magenta, red, HueDistanceCW)
+	cw.Set(magentaRed)
 
 	cw.Jump(Red) // Reset pointer
 

@@ -6,19 +6,22 @@ type RGB struct {
 	R, G, B float64
 }
 
-func (rgb RGB) FormalString() string {
-	return fmt.Sprintf("rgb(%f,%f,%f)", rgb.R, rgb.G, rgb.B)
+func (rgb RGB) RGB() RGB {
+	return rgb
 }
 
 func (rgb RGB) String() string {
-	return rgb.ToHex().String()
+	return fmt.Sprintf("rgb(%f,%f,%f)", rgb.R, rgb.G, rgb.B)
 }
 
-func BlendRGB(x RGB, y RGB) RGB {
-	return PartialBlendRGB(x, y, 0.5)
+func RGBBlend(a Color, b Color) Color {
+	return PartialRGBBlend(a, b, 0.5)
 }
 
-func PartialBlendRGB(x RGB, y RGB, percentage float64) RGB {
+func PartialRGBBlend(a Color, b Color, percentage float64) Color {
+	x := a.RGB()
+	y := b.RGB()
+
 	return RGB{
 		R: wavg(x.R, y.R, percentage),
 		G: wavg(x.G, y.G, percentage),
@@ -26,20 +29,20 @@ func PartialBlendRGB(x RGB, y RGB, percentage float64) RGB {
 	}
 }
 
-func RGBGradient(between int, rgb ...RGB) []RGB {
-	grad := make([]RGB, len(rgb)+(between*(len(rgb)-1)))
+func RGBGradient(between int, colors ...Color) []Color {
+	grad := make([]Color, len(colors)+(between*(len(colors)-1)))
 
 	steps := float64(between) + 1
 	weight := 1.0 / steps
 
-	grad[0] = rgb[0]
-	for i := 0; i < len(rgb)-1; i++ {
-		ca := rgb[i]
-		cb := rgb[i+1]
+	grad[0] = colors[0]
+	for i := 0; i < len(colors)-1; i++ {
+		ca := colors[i]
+		cb := colors[i+1]
 		curWeight := 0.0
 		offset := i * (between + 1)
 		for j := 0; j < between+2; j++ {
-			grad[j+offset] = PartialBlendRGB(ca, cb, curWeight)
+			grad[j+offset] = PartialRGBBlend(ca, cb, curWeight)
 			curWeight += weight
 		}
 	}

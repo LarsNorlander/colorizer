@@ -10,21 +10,17 @@ type HSV struct {
 	S, V float64
 }
 
-func (hsv HSV) FormalString() string {
+func (hsv HSV) String() string {
 	return fmt.Sprintf("hsv(%f, %f, %f)", hsv.H, hsv.S, hsv.V)
 }
 
-func (hsv HSV) String() string {
-	return hsv.ToRGB().ToHex().String()
-}
-
-func (rgb RGB) ToHSV() HSV {
+func (rgb RGB) HSV() HSV {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 	v := max
 
-	h := rgb.ToHue()
+	h := rgb.Hue()
 
 	var s float64
 	if v == 0 {
@@ -36,7 +32,7 @@ func (rgb RGB) ToHSV() HSV {
 	return HSV{H: h, S: s, V: v}
 }
 
-func (hsv HSV) ToRGB() RGB {
+func (hsv HSV) RGB() RGB {
 	c := hsv.V * hsv.S
 	hP := hsv.H.Val / 60
 	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
@@ -44,7 +40,10 @@ func (hsv HSV) ToRGB() RGB {
 	return computeRGB(c, x, hP, m)
 }
 
-func PartialBlendHSV(x HSV, y HSV, percentage float64, strategy HueDistanceSolver) HSV {
+func PartialHSVBlend(a Color, b Color, percentage float64, strategy HueDistanceSolver) Color {
+	x := a.RGB().HSV()
+	y := b.RGB().HSV()
+
 	distance := strategy(x.H, y.H)
 	movement := distance * percentage
 
@@ -55,20 +54,20 @@ func PartialBlendHSV(x HSV, y HSV, percentage float64, strategy HueDistanceSolve
 	}
 }
 
-func HSVGradient(between int, strategy HueDistanceSolver, hsv ...HSV) []HSV {
-	grad := make([]HSV, len(hsv)+(between*(len(hsv)-1)))
+func HSVGradient(between int, strategy HueDistanceSolver, colors ...Color) []Color {
+	grad := make([]Color, len(colors)+(between*(len(colors)-1)))
 
 	steps := float64(between) + 1
 	weight := 1.0 / steps
 
-	grad[0] = hsv[0]
-	for i := 0; i < len(hsv)-1; i++ {
-		ca := hsv[i]
-		cb := hsv[i+1]
+	grad[0] = colors[0]
+	for i := 0; i < len(colors)-1; i++ {
+		ca := colors[i]
+		cb := colors[i+1]
 		curWeight := 0.0
 		offset := i * (between + 1)
 		for j := 0; j < between+2; j++ {
-			grad[j+offset] = PartialBlendHSV(ca, cb, curWeight, strategy)
+			grad[j+offset] = PartialHSVBlend(ca, cb, curWeight, strategy)
 			curWeight += weight
 		}
 	}

@@ -35,24 +35,24 @@ func NewColorWheel() *ColorWheel {
 }
 
 // Moves current pointer to the next value, and returns it
-func (cw *ColorWheel) Next() RGB {
+func (cw *ColorWheel) Next() Color {
 	cw.current = cw.current.next
 	return cw.current.value
 }
 
 // Moves current pointer to the previous value, and returns it
-func (cw *ColorWheel) Previous() RGB {
+func (cw *ColorWheel) Previous() Color {
 	cw.current = cw.current.previous
 	return cw.current.value
 }
 
 // Get the value at the current pointer
-func (cw *ColorWheel) Get() RGB {
+func (cw *ColorWheel) Get() Color {
 	return cw.current.value
 }
 
 // Get the value at a specific index
-func (cw *ColorWheel) GetAt(index int) RGB {
+func (cw *ColorWheel) GetAt(index int) Color {
 	if index < 0 || index >= cw.size {
 		panic("index out of bounds")
 	}
@@ -76,12 +76,12 @@ func (cw *ColorWheel) getNodeAt(index int) *node {
 
 // Set a new value for the current pointer
 // TODO Implement set, so that it blends the colors next to it
-func (cw *ColorWheel) Set(rgb RGB) {
-	cw.current.value = rgb
+func (cw *ColorWheel) Set(color Color) {
+	cw.current.value = color
 }
 
 // Grab the RGB value at a specific point in the color wheel.
-func (cw *ColorWheel) Sample(degrees float64) RGB {
+func (cw *ColorWheel) Sample(degrees float64) Color {
 	degrees = normalizeDegrees(degrees)
 
 	index := int(math.Floor(degrees / 30))
@@ -89,16 +89,16 @@ func (cw *ColorWheel) Sample(degrees float64) RGB {
 
 	blendPercentage := (degrees - (float64(index) * 30)) / 30
 
-	return PartialBlendHSL(
-		start.value.ToHSL(),
-		start.next.value.ToHSL(),
+	return PartialHSLBlend(
+		start.value,
+		start.next.value,
 		blendPercentage,
 		HueDistanceCW, // In the future, look up the resolution strategy of the section
-	).ToRGB()
+	)
 }
 
 // Move the pointer to the specified index and return the value in it, does not roll over
-func (cw *ColorWheel) Jump(index int) RGB {
+func (cw *ColorWheel) Jump(index int) Color {
 	if index < 0 || index >= cw.size {
 		panic("index out of bounds")
 	}
@@ -113,7 +113,7 @@ func (cw ColorWheel) String() string {
 	str := "["
 	cur := cw.start
 	for {
-		str += cur.value.ToHex().String()
+		str += cur.value.RGB().Hex().String()
 		cur = cur.next
 		if cur == cw.start {
 			break
@@ -126,6 +126,6 @@ func (cw ColorWheel) String() string {
 
 type node struct {
 	previous *node
-	value    RGB
+	value    Color
 	next     *node
 }

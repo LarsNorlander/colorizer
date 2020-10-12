@@ -6,11 +6,11 @@ import (
 )
 
 type InvalidHueError struct {
-	Hue
+	value float64
 }
 
 func (e *InvalidHueError) Error() string {
-	return fmt.Sprintf("invalid hue value: %.2f, must be in the range of [0, 360)", e.Hue.Val)
+	return fmt.Sprintf("invalid hue value: %.2f, must be in the range of [0, 360)", e.value)
 }
 
 func NewHue(val float64) Hue {
@@ -29,7 +29,7 @@ func (hue Hue) IsValid() bool {
 
 func (hue Hue) MustBeValid() {
 	if !hue.IsValid() {
-		panic(&InvalidHueError{hue})
+		panic(&InvalidHueError{hue.Val})
 	}
 }
 
@@ -104,7 +104,7 @@ func normalizeDegrees(val float64) float64 {
 	return val
 }
 
-func (rgb RGB) ToHue() Hue {
+func (rgb RGB) Hue() Hue {
 	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
 	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min

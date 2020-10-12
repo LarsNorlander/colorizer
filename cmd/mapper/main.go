@@ -7,22 +7,22 @@ import (
 
 func main() {
 	cw := color.GenerateColorWheel(
-		color.MustParseHex("#FF0000").ToRGB(),
-		color.MustParseHex("#00ff00").ToRGB(),
-		color.MustParseHex("#0000ff").ToRGB(),
+		color.MustParseHex("#FF0000").RGB(),
+		color.MustParseHex("#00ff00").RGB(),
+		color.MustParseHex("#0000ff").RGB(),
 	)
-	blk := color.MustParseHex("#000000").ToRGB()
-	wht := color.MustParseHex("#ffffff").ToRGB()
+	blk := color.MustParseHex("#000000").RGB()
+	wht := color.MustParseHex("#ffffff").RGB()
 
 	rgb := []color.RGB{
-		//color.MustParseHex("#ff0000").ToRGB(),
-		//color.MustParseHex("#000000").ToRGB(),
-		//color.MustParseHex("#ffffff").ToRGB(),
-		color.MustParseHex("#503030").ToRGB(),
-		//color.MustParseHex("#602020").ToRGB(),
-		//color.MustParseHex("#bf4040").ToRGB(),
-		//color.MustParseHex("#bf4040").ToRGB(),
-		//color.MustParseHex("#bfff40").ToRGB(),
+		//color.MustParseHex("#ff0000").RGB(),
+		//color.MustParseHex("#000000").RGB(),
+		//color.MustParseHex("#ffffff").RGB(),
+		color.MustParseHex("#503030").RGB(),
+		//color.MustParseHex("#602020").RGB(),
+		//color.MustParseHex("#bf4040").RGB(),
+		//color.MustParseHex("#bf4040").RGB(),
+		//color.MustParseHex("#bfff40").RGB(),
 	}
 
 	for i := range rgb {
