@@ -27,7 +27,7 @@ func main() {
 
 	for i := range rgb {
 		original := rgb[i]
-		mapped := color.MapToWold(cw, blk, wht, original)
+		mapped := color.NewMapper(cw, blk, wht)(original)
 		fmt.Printf("original: %s\nmapped  : %s\n", original, mapped)
 		fmt.Println()
 	}

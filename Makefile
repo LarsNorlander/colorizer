@@ -1,8 +1,3 @@
-.PHONEY: test
-test:
-	go run main.go > out.txt
-	code out.txt
-
 .PHONEY: rbt
 rbt:
 	go run cmd/rbt/main.go > out.rbt.txt

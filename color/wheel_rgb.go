@@ -1,5 +1,6 @@
 package color
 
+// TODO Create a function that takes a map with keys and generate a color wheel with arbitrary items.
 func GenerateColorWheel(red Color, green Color, blue Color) *ColorWheel {
 	const (
 		Red = iota

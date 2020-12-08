@@ -12,24 +12,28 @@ var (
 	blackHueLine = lineFromPoints(blackPoint, huePoint)
 )
 
-func MapToWold(hues *ColorWheel, black Color, white Color, input Color) Color {
-	src := input.RGB().HSL()
+type Mapper func(input Color) Color
 
-	pureHue := hues.Sample(src.H.Val)
-	lumSample := PartialHSLBlend(black, white, src.L, HueDistanceCW).RGB()
-	lumLine := Line{Slope: 0, YIntercept: src.L}
+func NewMapper(hues *ColorWheel, black Color, white Color) Mapper {
+	return func(input Color) Color {
+		src := input.RGB().HSL()
 
-	if src.L == 0.5 {
-		return PartialRGBBlend(lumSample, pureHue, src.S)
-	} else if src.L > 0.5 {
-		inter := intersect(lumLine, whiteHueLine)
-		dist := distanceBetweenPoints(inter, whitePoint)
-		mixer := PartialRGBBlend(white, pureHue, dist)
-		return PartialRGBBlend(lumSample, mixer, src.S)
-	} else {
-		inter := intersect(lumLine, blackHueLine)
-		dist := distanceBetweenPoints(inter, blackPoint)
-		mixer := PartialRGBBlend(black, pureHue, dist)
-		return PartialRGBBlend(lumSample, mixer, src.S)
+		pureHue := hues.Sample(src.H.Val)
+		lumSample := PartialHSLBlend(black, white, src.L, HueDistanceCW).RGB()
+		lumLine := Line{Slope: 0, YIntercept: src.L}
+
+		if src.L == 0.5 {
+			return PartialRGBBlend(lumSample, pureHue, src.S)
+		} else if src.L > 0.5 {
+			inter := intersect(lumLine, whiteHueLine)
+			dist := distanceBetweenPoints(inter, whitePoint)
+			mixer := PartialRGBBlend(white, pureHue, dist)
+			return PartialRGBBlend(lumSample, mixer, src.S)
+		} else {
+			inter := intersect(lumLine, blackHueLine)
+			dist := distanceBetweenPoints(inter, blackPoint)
+			mixer := PartialRGBBlend(black, pureHue, dist)
+			return PartialRGBBlend(lumSample, mixer, src.S)
+		}
 	}
 }

@@ -14,10 +14,6 @@ func (rgb RGB) String() string {
 	return fmt.Sprintf("rgb(%f,%f,%f)", rgb.R, rgb.G, rgb.B)
 }
 
-func RGBBlend(a Color, b Color) Color {
-	return PartialRGBBlend(a, b, 0.5)
-}
-
 func PartialRGBBlend(a Color, b Color, percentage float64) Color {
 	x := a.RGB()
 	y := b.RGB()
