@@ -30,7 +30,7 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	counter := start + 1
 	last := start
 	for {
-		index := counter % 12
+		index := counter
 		color := cw.GetAt(index)
 
 		if color != nil {
@@ -38,7 +38,7 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 			last = index
 		}
 
-		if index == start {
+		if index%12 == start {
 			break
 		}
 		counter++
@@ -46,9 +46,9 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 
 	for _, gap := range gaps {
 		gapSize := gap.y - gap.x - 1
-		colors := HSLGradient(gapSize, HueDistanceCW, cw.GetAt(gap.x%12), cw.GetAt(gap.y%12))
+		colors := HSLGradient(gapSize, HueDistanceCW, cw.GetAt(gap.x), cw.GetAt(gap.y))
 		for i, color := range colors {
-			cw.Jump((gap.x + i) % 12)
+			cw.Jump(gap.x + i)
 			cw.Set(color)
 		}
 	}

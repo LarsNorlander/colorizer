@@ -59,9 +59,11 @@ func (cw *ColorWheel) Get() Color {
 
 // Get the value at a specific index
 func (cw *ColorWheel) GetAt(index int) Color {
-	if index < 0 || index >= cw.size {
+	if index < 0 {
 		panic("index out of bounds")
 	}
+	index %= 12
+
 	current := cw.start
 	for i := 0; i < index; i++ {
 		current = current.next
@@ -70,9 +72,11 @@ func (cw *ColorWheel) GetAt(index int) Color {
 }
 
 func (cw *ColorWheel) getNodeAt(index int) *node {
-	if index < 0 || index >= cw.size {
+	if index < 0 {
 		panic("index out of bounds")
 	}
+	index %= 12
+
 	current := cw.start
 	for i := 0; i < index; i++ {
 		current = current.next
@@ -104,9 +108,11 @@ func (cw *ColorWheel) Sample(degrees float64) Color {
 
 // Move the pointer to the specified index and return the value in it, does not roll over
 func (cw *ColorWheel) Jump(index int) Color {
-	if index < 0 || index >= cw.size {
+	if index < 0 {
 		panic("index out of bounds")
 	}
+	index %= 12
+
 	cw.current = cw.start
 	for i := 0; i < index; i++ {
 		cw.current = cw.current.next
