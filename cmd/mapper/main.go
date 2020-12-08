@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	cw := color.GenerateColorWheel(
+	cw := color.GenerateColorWheelFromRGB(
 		color.MustParseHex("#FF0000").RGB(),
 		color.MustParseHex("#00ff00").RGB(),
 		color.MustParseHex("#0000ff").RGB(),

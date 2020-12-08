@@ -1,72 +1,85 @@
 package color
 
-// TODO Create a function that takes a map with keys and generate a color wheel with arbitrary items.
-func GenerateColorWheel(red Color, green Color, blue Color) *ColorWheel {
-	const (
-		Red = iota
-		Orange
-		Yellow
-		YellowGreen
-		Green
-		GreenCyan
-		Cyan
-		CyanBlue
-		Blue
-		BlueMagenta
-		Magenta
-		MagentaRed
-	)
+import "errors"
+
+//goland:noinspection GoNameStartsWithPackageName
+type ColorName int
+
+//goland:noinspection GoUnusedConst
+const (
+	Red ColorName = iota
+	Orange
+	Yellow
+	YellowGreen
+	Green
+	GreenCyan
+	Cyan
+	CyanBlue
+	Blue
+	BlueMagenta
+	Magenta
+	MagentaRed
+)
+
+func GenerateColorWheel(colors map[ColorName]Color) (*ColorWheel, error) {
+	if len(colors) < 2 {
+		return nil, errors.New("at least two colors should be provided")
+	}
 
 	cw := NewColorWheel()
+	for i, color := range colors {
+		cw.Jump(int(i))
+		cw.Set(color)
+	}
 
-	// Set RGB
-	cw.Jump(Red)
-	cw.Set(red)
+	var start int
+	for i, color := range colors {
+		if color == nil {
+			continue
+		}
+		start = int(i)
+		break
+	}
 
-	cw.Jump(Green)
-	cw.Set(green)
+	type pair struct {
+		x, y int
+	}
+	var gaps []pair
 
-	cw.Jump(Blue)
-	cw.Set(blue)
+	counter := start + 1
+	last := start
+	for {
+		index := counter % 12
+		color := cw.GetAt(index)
 
-	cw.Jump(Yellow)
-	yellow := HSLBlend(red, green, HueDistanceCW)
-	cw.Set(yellow)
+		if color != nil {
+			gaps = append(gaps, pair{x: last, y: counter})
+			last = index
+		}
 
-	cw.Jump(Cyan)
-	cyan := HSLBlend(green, blue, HueDistanceCW)
-	cw.Set(cyan)
+		if index == start {
+			break
+		}
+		counter++
+	}
 
-	cw.Jump(Magenta)
-	magenta := HSLBlend(blue, red, HueDistanceCW)
-	cw.Set(magenta)
+	for _, gap := range gaps {
+		gapSize := gap.y - gap.x - 1
+		colors := HSLGradient(gapSize, HueDistanceCW, cw.GetAt(gap.x%12), cw.GetAt(gap.y%12))
+		for i, color := range colors {
+			cw.Jump((gap.x + i) % 12)
+			cw.Set(color)
+		}
+	}
 
-	// Set Tertiary
-	cw.Jump(Orange)
-	orange := HSLBlend(red, yellow, HueDistanceCW)
-	cw.Set(orange)
+	return cw, nil
+}
 
-	cw.Jump(YellowGreen)
-	greenYellow := HSLBlend(yellow, green, HueDistanceCW)
-	cw.Set(greenYellow)
-
-	cw.Jump(GreenCyan)
-	greenCyan := HSLBlend(green, cyan, HueDistanceCW)
-	cw.Set(greenCyan)
-
-	cw.Jump(CyanBlue)
-	cyanBlue := HSLBlend(cyan, blue, HueDistanceCW)
-	cw.Set(cyanBlue)
-
-	cw.Jump(BlueMagenta)
-	blueMagenta := HSLBlend(blue, magenta, HueDistanceCW)
-	cw.Set(blueMagenta)
-
-	cw.Jump(MagentaRed)
-	magentaRed := HSLBlend(magenta, red, HueDistanceCW)
-	cw.Set(magentaRed)
-
-	cw.Jump(Red) // Reset pointer
-
+func GenerateColorWheelFromRGB(red Color, green Color, blue Color) *ColorWheel {
+	cw, _ := GenerateColorWheel(map[ColorName]Color{
+		Red:   red,
+		Green: green,
+		Blue:  blue,
+	})
 	return cw
 }

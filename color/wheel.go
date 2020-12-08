@@ -81,7 +81,6 @@ func (cw *ColorWheel) getNodeAt(index int) *node {
 }
 
 // Set a new value for the current pointer
-// TODO Implement set, so that it blends the colors next to it
 func (cw *ColorWheel) Set(color Color) {
 	cw.current.value = color
 }
@@ -119,7 +118,11 @@ func (cw ColorWheel) String() string {
 	str := "["
 	cur := cw.start
 	for {
-		str += cur.value.RGB().Hex().String()
+		if cur.value == nil {
+			str += "nil"
+		} else {
+			str += cur.value.RGB().Hex().String()
+		}
 		cur = cur.next
 		if cur == cw.start {
 			break

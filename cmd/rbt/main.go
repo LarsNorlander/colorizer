@@ -56,7 +56,7 @@ func testGenerateColors(blk string, wht string, r string, g string, b string) {
 	green := color.MustParseHex(g).RGB()
 	blue := color.MustParseHex(b).RGB()
 
-	cw := color.GenerateColorWheel(
+	cw := color.GenerateColorWheelFromRGB(
 		red,
 		green,
 		blue,
