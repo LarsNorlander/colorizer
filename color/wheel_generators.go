@@ -2,26 +2,7 @@ package color
 
 import "errors"
 
-//goland:noinspection GoNameStartsWithPackageName
-type ColorName int
-
-//goland:noinspection GoUnusedConst
-const (
-	Red ColorName = iota
-	Orange
-	Yellow
-	YellowGreen
-	Green
-	GreenCyan
-	Cyan
-	CyanBlue
-	Blue
-	BlueMagenta
-	Magenta
-	MagentaRed
-)
-
-func GenerateColorWheel(colors map[ColorName]Color) (*ColorWheel, error) {
+func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	if len(colors) < 2 {
 		return nil, errors.New("at least two colors should be provided")
 	}
@@ -76,7 +57,7 @@ func GenerateColorWheel(colors map[ColorName]Color) (*ColorWheel, error) {
 }
 
 func GenerateColorWheelFromRGB(red Color, green Color, blue Color) *ColorWheel {
-	cw, _ := GenerateColorWheel(map[ColorName]Color{
+	cw, _ := GenerateColorWheel(map[Name]Color{
 		Red:   red,
 		Green: green,
 		Blue:  blue,
