@@ -8,11 +8,13 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	}
 
 	cw := NewColorWheel()
+	// Set the colors where already provided
 	for i, color := range colors {
 		cw.Jump(int(i))
 		cw.Set(color)
 	}
 
+	// Figure out where the gaps are
 	var start int
 	for i, color := range colors {
 		if color == nil {
@@ -44,6 +46,7 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 		counter++
 	}
 
+	// Fill in the gaps
 	for _, gap := range gaps {
 		gapSize := gap.y - gap.x - 1
 		colors := HSLGradient(gapSize, HueDistanceCW, cw.GetAt(gap.x), cw.GetAt(gap.y))
