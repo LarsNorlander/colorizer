@@ -10,8 +10,7 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	cw := NewColorWheel()
 	// Set the colors where already provided
 	for i, color := range colors {
-		cw.Jump(int(i))
-		cw.Set(color)
+		cw.Set(int(i), color)
 	}
 
 	// Figure out where the gaps are
@@ -33,7 +32,7 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	last := start
 	for {
 		index := counter
-		color := cw.GetAt(index)
+		color := cw.Get(index)
 
 		if color != nil {
 			gaps = append(gaps, pair{x: last, y: counter})
@@ -49,21 +48,11 @@ func GenerateColorWheel(colors map[Name]Color) (*ColorWheel, error) {
 	// Fill in the gaps
 	for _, gap := range gaps {
 		gapSize := gap.y - gap.x - 1
-		colors := HSLGradient(gapSize, HueDistanceCW, cw.GetAt(gap.x), cw.GetAt(gap.y))
+		colors := HSLGradient(gapSize, HueDistanceCW, cw.Get(gap.x), cw.Get(gap.y))
 		for i, color := range colors {
-			cw.Jump(gap.x + i)
-			cw.Set(color)
+			cw.Set(gap.x+i, color)
 		}
 	}
 
 	return cw, nil
-}
-
-func GenerateColorWheelFromRGB(red Color, green Color, blue Color) *ColorWheel {
-	cw, _ := GenerateColorWheel(map[Name]Color{
-		Red:   red,
-		Green: green,
-		Blue:  blue,
-	})
-	return cw
 }

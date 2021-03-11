@@ -43,7 +43,7 @@ func tableFn(cmd *cobra.Command, args []string) error {
 	for i := 0; i < 12; i++ {
 		line := RGBGradient(6,
 			MustParseHex("#000000"),
-			cw.GetAt(i),
+			cw.Get(i),
 			MustParseHex("#FFFFFF"),
 		)
 		for _, color := range line {
@@ -60,7 +60,7 @@ func tableFn(cmd *cobra.Command, args []string) error {
 	for i := 0; i < 12; i++ {
 		line := RGBGradient(12,
 			gray,
-			cw.GetAt(i),
+			cw.Get(i),
 		)
 		for _, color := range line {
 			fmt.Print(color.RGB().Hex())
