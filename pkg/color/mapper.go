@@ -2,11 +2,11 @@ package color
 
 var (
 	// Define luminosity points
-	whitePoint = Point{0, 1}
-	blackPoint = Point{0, 0}
+	whitePoint = point{0, 1}
+	blackPoint = point{0, 0}
 	// Calculate pure hue point
 	huePointX = triangleHeight(1, areaEqTriangle(1))
-	huePoint  = Point{huePointX, 0.5}
+	huePoint  = point{huePointX, 0.5}
 	// Calculate lines
 	whiteHueLine = lineFromPoints(whitePoint, huePoint)
 	blackHueLine = lineFromPoints(blackPoint, huePoint)
@@ -20,7 +20,7 @@ func NewMapper(hues *ColorWheel, black Color, white Color) Mapper {
 
 		pureHue := hues.Sample(src.H.Val)
 		lumSample := PartialHSLBlend(black, white, src.L, HueDistanceCW).RGB()
-		lumLine := Line{Slope: 0, YIntercept: src.L}
+		lumLine := line{slope: 0, yIntercept: src.L}
 
 		if src.L == 0.5 {
 			return PartialRGBBlend(lumSample, pureHue, src.S)

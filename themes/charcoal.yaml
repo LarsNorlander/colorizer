@@ -1,0 +1,25 @@
+name: Charcoal
+author: Lars Norlander
+
+colors:
+  # Black & White
+  black: "#1F2022"
+  white: "#F7F8FA"
+
+  # RGB
+  red: "#FF4D65"
+  green: "#00FF17"
+  blue: "#478CFF"
+
+  # CYM
+  cyan: "#00E1FF"
+  yellow: "#FFDE00"
+  magenta: "#DE51FF"
+
+  # Misc
+  orange: "#FFAA00"
+  yellowGreen: "#84FF00"
+  greenCyan: "#00FFB3"
+  cyanBlue: "#24B7FF"
+  blueMagenta: "#8453FF"
+  magentaRed: "#FF4FC3"

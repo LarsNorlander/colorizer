@@ -1,9 +1,7 @@
 package color
 
-//goland:noinspection GoNameStartsWithPackageName
 type Name int
 
-//goland:noinspection GoUnusedConst
 const (
 	Red Name = iota
 	Orange
