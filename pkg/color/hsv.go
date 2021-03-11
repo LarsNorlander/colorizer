@@ -2,7 +2,7 @@ package color
 
 import (
 	"fmt"
-	. "math"
+	"math"
 )
 
 type HSV struct {
@@ -10,13 +10,9 @@ type HSV struct {
 	S, V float64
 }
 
-func (hsv HSV) String() string {
-	return fmt.Sprintf("hsv(%s, %.1f%%, %.1f%%)", hsv.H, hsv.S, hsv.V)
-}
-
 func (rgb RGB) HSV() HSV {
-	min := Min(Min(rgb.R, rgb.G), rgb.B)
-	max := Max(Max(rgb.R, rgb.G), rgb.B)
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 	v := max
 
@@ -35,9 +31,13 @@ func (rgb RGB) HSV() HSV {
 func (hsv HSV) RGB() RGB {
 	c := hsv.V * hsv.S
 	hP := hsv.H.Val / 60
-	x := c * (1 - Abs(Mod(hP, 2)-1))
+	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
 	m := hsv.V - c
 	return computeRGB(c, x, hP, m)
+}
+
+func (hsv HSV) String() string {
+	return fmt.Sprintf("hsv(%s, %.1f%%, %.1f%%)", hsv.H, hsv.S, hsv.V)
 }
 
 func PartialHSVBlend(a Color, b Color, percentage float64, strategy HueDistanceSolver) Color {

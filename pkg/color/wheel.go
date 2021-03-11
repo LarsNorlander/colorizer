@@ -1,7 +1,7 @@
 package color
 
 import (
-	. "math"
+	"math"
 )
 
 func NewColorWheel() *ColorWheel {
@@ -93,7 +93,7 @@ func (cw *ColorWheel) Set(color Color) {
 func (cw *ColorWheel) Sample(degrees float64) Color {
 	degrees = normalizeDegrees(degrees)
 
-	index := int(Floor(degrees / 30))
+	index := int(math.Floor(degrees / 30))
 	start := cw.getNodeAt(index)
 
 	blendPercentage := (degrees - (float64(index) * 30)) / 30

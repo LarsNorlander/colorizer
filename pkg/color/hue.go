@@ -2,7 +2,7 @@ package color
 
 import (
 	"fmt"
-	. "math"
+	"math"
 )
 
 type InvalidHueError struct {
@@ -24,14 +24,14 @@ type Hue struct {
 }
 
 func (rgb RGB) Hue() Hue {
-	min := Min(Min(rgb.R, rgb.G), rgb.B)
-	max := Max(Max(rgb.R, rgb.G), rgb.B)
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 
 	var hP float64
 	switch max {
 	case rgb.R:
-		hP = Mod((rgb.G-rgb.B)/c, 6)
+		hP = math.Mod((rgb.G-rgb.B)/c, 6)
 	case rgb.G:
 		hP = ((rgb.B - rgb.R) / c) + 2
 	case rgb.B:
@@ -101,8 +101,8 @@ func HueDistanceNearest(from Hue, to Hue) float64 {
 	cwd := HueDistanceCW(from, to)
 	ccwd := HueDistanceCCW(from, to)
 
-	acwd := Abs(cwd)
-	accwd := Abs(ccwd)
+	acwd := math.Abs(cwd)
+	accwd := math.Abs(ccwd)
 
 	if acwd > accwd {
 		return ccwd
@@ -115,10 +115,10 @@ func normalizeDegrees(val float64) float64 {
 	if val >= 0 && val < 360 {
 		return val
 	} else if val >= 360 {
-		rev := Floor(val / 360)
+		rev := math.Floor(val / 360)
 		val -= 360 * rev
 	} else if val < 0 {
-		rev := Floor(Abs(val / 360))
+		rev := math.Floor(math.Abs(val / 360))
 		val += 360 + (360 * rev)
 	}
 	return val

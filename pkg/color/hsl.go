@@ -2,7 +2,7 @@ package color
 
 import (
 	"fmt"
-	. "math"
+	"math"
 )
 
 type HSL struct {
@@ -11,8 +11,8 @@ type HSL struct {
 }
 
 func (rgb RGB) HSL() HSL {
-	min := Min(Min(rgb.R, rgb.G), rgb.B)
-	max := Max(Max(rgb.R, rgb.G), rgb.B)
+	min := math.Min(math.Min(rgb.R, rgb.G), rgb.B)
+	max := math.Max(math.Max(rgb.R, rgb.G), rgb.B)
 	c := max - min
 	l := (max + min) / 2
 
@@ -30,16 +30,16 @@ func (rgb RGB) HSL() HSL {
 	if l == 0 || l == 1 {
 		s = 0
 	} else {
-		s = c / (1 - Abs(2*l-1))
+		s = c / (1 - math.Abs(2*l-1))
 	}
 
 	return HSL{H: h, S: s, L: l}
 }
 
 func (hsl HSL) RGB() RGB {
-	c := (1 - Abs(2*hsl.L-1)) * hsl.S
+	c := (1 - math.Abs(2*hsl.L-1)) * hsl.S
 	hP := hsl.H.Val / 60
-	x := c * (1 - Abs(Mod(hP, 2)-1))
+	x := c * (1 - math.Abs(math.Mod(hP, 2)-1))
 	m := hsl.L - c/2
 	return computeRGB(c, x, hP, m)
 }
