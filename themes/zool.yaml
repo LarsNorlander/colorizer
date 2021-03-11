@@ -1,0 +1,12 @@
+metadata:
+  name: Zool Engineering
+  author: Lars Norlander
+
+black: "#000000"
+white: "#FFFFFF"
+
+colors:
+  red: "#f92d0f"
+  green: "#0ff9a1"
+  blue: "#0f84f9"
+  yellow: "#f9f00f"

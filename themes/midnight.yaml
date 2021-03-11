@@ -1,11 +1,12 @@
-name: Midnight
-author: Lars Norlander
+metadata:
+  name: Midnight
+  author: Lars Norlander
+
+# Black & White
+black: "#1A1F27"
+white: "#F7F8FA"
 
 colors:
-  # Black & White
-  black: "#1A1F27"
-  white: "#F7F8FA"
-
   # RGB
   red: "#FF4D65"
   green: "#00FF17"

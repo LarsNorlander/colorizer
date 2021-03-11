@@ -1,11 +1,12 @@
-name: Charcoal
-author: Lars Norlander
+metadata:
+  name: Charcoal
+  author: Lars Norlander
+
+# Black & White
+black: "#1F2022"
+white: "#F7F8FA"
 
 colors:
-  # Black & White
-  black: "#1F2022"
-  white: "#F7F8FA"
-
   # RGB
   red: "#FF4D65"
   green: "#00FF17"
