@@ -15,7 +15,7 @@ func init() {
 		RunE:  hueFn,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.New("requires a color argument")
+				return errors.New("hue requires a color argument")
 			}
 			return nil
 		},

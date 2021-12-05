@@ -11,7 +11,7 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "serve",
-		Short: "start the colorizer server",
+		Short: "Start the colorizer server",
 		RunE:  serveFn,
 	})
 }
